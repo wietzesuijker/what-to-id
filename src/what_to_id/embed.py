@@ -327,8 +327,10 @@ def save_embeddings(
 
 def load_embeddings(path: Path) -> tuple[np.ndarray, np.ndarray]:
     """Return (ids int64, E float32) from an npz written by save_embeddings."""
-    z = np.load(path)  # self-written cache, plain arrays only, no pickle
-    return z["ids"].astype(np.int64), z["E"].astype(np.float32)
+    from what_to_id.arms import load_embeddings as load_validated_embeddings
+
+    ids, E, _ = load_validated_embeddings(path)
+    return ids, E
 
 
 def embed_group(
@@ -434,7 +436,7 @@ def separability_report(E: np.ndarray, labels: Sequence[str | None]) -> dict:
     """kNN leave-one-out separability (%) via labelfirst; ``n`` counts labelled rows."""
     import labelfirst
 
-    labels = list(labels)
+    labels = [None if pd.isna(v) or v == "" else v for v in labels]
     if len(labels) != len(E):
         raise ValueError(f"labels ({len(labels)}) must align with E rows ({len(E)})")
     pct = float(labelfirst.separability_score(np.asarray(E, dtype=np.float32), labels))

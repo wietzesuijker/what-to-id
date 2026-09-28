@@ -112,11 +112,22 @@ class Surprise:
 def load_embeddings(path: Path) -> tuple[np.ndarray, np.ndarray, str]:
     """Return (ids int64, E float32 unit rows, backbone) from an npz written by the embed step."""
     with np.load(path, allow_pickle=False) as z:
-        ids = np.asarray(z["ids"], dtype=np.int64)
+        raw_ids = np.asarray(z["ids"])
+        if raw_ids.ndim != 1 or raw_ids.dtype.kind not in "iu":
+            raise ValueError(f"{path}: ids must be a one-dimensional integer array")
+        if raw_ids.size and raw_ids.max() > np.iinfo(np.int64).max:
+            raise ValueError(f"{path}: ids exceed the int64 range")
+        ids = raw_ids.astype(np.int64)
         E = np.asarray(z["E"], dtype=np.float32)
         backbone = str(z["backbone"]) if "backbone" in z.files else ""
     if E.ndim != 2 or E.shape[0] != ids.shape[0]:
         raise ValueError(f"{path}: E shape {E.shape} does not match {ids.shape[0]} ids")
+    if E.shape[1] == 0:
+        raise ValueError(f"{path}: embeddings must have at least one dimension")
+    if not np.isfinite(E).all():
+        raise ValueError(f"{path}: embeddings must contain only finite values")
+    if not np.allclose(np.linalg.norm(E.astype(np.float64), axis=1), 1.0, atol=1e-5):
+        raise ValueError(f"{path}: embedding rows must have unit norm (zero rows are invalid)")
     if len(np.unique(ids)) != len(ids):
         raise ValueError(f"{path}: duplicate ids")
     return ids, E, backbone
@@ -132,6 +143,8 @@ class _EmbeddingStore:
     def __init__(self, paths: Mapping[str, Path] | Path | str):
         self._paths = paths
         self._cache: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+        self._models: dict[str, str] = {}
+        self.backbones: dict[str | None, str] = {}
 
     def lookup(self, group: str | None) -> tuple[np.ndarray, np.ndarray]:
         if isinstance(self._paths, Mapping):
@@ -144,8 +157,10 @@ class _EmbeddingStore:
             path = Path(self._paths)
         key = str(path)
         if key not in self._cache:
-            ids, E, _ = load_embeddings(Path(path))
+            ids, E, backbone = load_embeddings(Path(path))
             self._cache[key] = (ids, E)
+            self._models[key] = backbone
+        self.backbones[group] = self._models.get(key, "")
         return self._cache[key]
 
 
@@ -191,7 +206,7 @@ class Similarity:
         return self._store.lookup(group)
 
     def order(self, pool: pd.DataFrame, *, seed: int) -> np.ndarray:
-        from labelfirst.strategies.coreset import CoreSet
+        from labelfirst import CoreSet
 
         if len(pool) == 0:
             return np.empty(0, dtype=np.int64)
@@ -306,6 +321,13 @@ class Novelty:
         group = _pool_group(pool)
         emb_ids, E_all = self._pool.lookup(group)
         ref_ids, R = self._ref.lookup(group)
+        candidate_model = self._pool.backbones.get(group)
+        reference_model = self._ref.backbones.get(group)
+        if candidate_model and reference_model and candidate_model != reference_model:
+            raise ValueError(
+                f"embedding backbones differ: pool {candidate_model!r} "
+                f"vs reference {reference_model!r}"
+            )
         pos_in_emb, embedded, rest = _align(pool, emb_ids)
         if embedded.size == 0 or R.size == 0:
             return _recency_order(pool)

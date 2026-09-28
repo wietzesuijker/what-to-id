@@ -21,10 +21,9 @@ dependencies = [
 what-to-id = "what_to_id.cli:main"
 
 [project.optional-dependencies]
-# labelfirst is private and not on PyPI; pinned to the immutable 0.9.0 commit, same pin as
-# speciesfirst. Only the similarity arm's seed picker and the separability report need it.
+# Only the similarity arm's seed picker and separability report require this private pin.
 similarity = [
-    "labelfirst @ git+https://github.com/traitlab/labelfirst.git@5fed14e1870fb8e6ad390d60a9b12e60eaa549f2",
+    "labelfirst @ git+https://github.com/traitlab/labelfirst.git@791662c0f0d04698f988640aa58ece1f5cb6be59",
 ]
 embed = ["torch>=2.1", "torchvision>=0.16", "open_clip_torch>=2.24", "pillow>=10.0"]
 dev = ["pytest>=7.4", "ruff>=0.4"]
@@ -44,5 +43,5 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers -m 'not network'"
-markers = ["network: hits the live iNaturalist API"]
+addopts = "-ra --strict-markers -m 'not network and not labelfirst'"
+markers = ["network: hits the live iNaturalist API", "labelfirst: requires the pinned optional LabelFirst integration"]
