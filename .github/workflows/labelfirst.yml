@@ -40,5 +40,10 @@ jobs:
           path: .integration/labelfirst
           token: ${{ secrets.LABELFIRST_READ_TOKEN }}
           persist-credentials: false
-      - run: pip install -e '.[dev]' -e .integration/labelfirst
-      - run: python -m pytest -m 'not network'
+      - run: pip install --require-hashes -r requirements.lock -r requirements-similarity.lock
+      - run: pip install --no-deps -e .integration/labelfirst
+      - run: pip check
+      - name: Test the consumer with the real optional dependency
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -m 'not network'

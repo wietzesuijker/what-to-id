@@ -47,6 +47,10 @@ jobs:
       BLITZ_D1: ${{ vars.BLITZ_D1 || '2026-11-01' }}
       FULL_PULL: ${{ inputs.full_pull }}
       WTB_DIR: wtb/cluster_results/ca
+      ARMS: recency,gap_first,similarity,novelty
+      EMBEDDING_RELEASE: ${{ vars.EMBEDDING_RELEASE }}
+      EMBEDDING_REPO: ${{ vars.EMBEDDING_REPO || github.repository }}
+      EMBEDDING_BUNDLE: data/embedding-bundle
     steps:
       # CODE_REF (a tag such as blitz-bc-2026) pins the code for the whole blitz; unset, the
       # job runs the commit that triggered it. Either way the build record names the commit.
@@ -57,8 +61,45 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements.lock
-      - run: pip install --require-hashes -r requirements.lock
+          cache-dependency-path: |
+            requirements.lock
+            requirements-similarity.lock
+      - name: Resolve LabelFirst revision and require daily inputs
+        id: labelfirst
+        env:
+          LABELFIRST_READ_TOKEN: ${{ secrets.LABELFIRST_READ_TOKEN }}
+        run: |
+          if [ -z "$LABELFIRST_READ_TOKEN" ]; then
+            echo '::error::LABELFIRST_READ_TOKEN needs read-only Contents access to traitlab/labelfirst.'
+            exit 1
+          fi
+          if [ -z "$EMBEDDING_RELEASE" ]; then
+            echo '::error::Set EMBEDDING_RELEASE to a prepared embedding bundle release tag.'
+            exit 1
+          fi
+          python - <<'PYTHON' >> "$GITHUB_OUTPUT"
+          import tomllib
+          with open("pyproject.toml", "rb") as stream:
+              config = tomllib.load(stream)
+          requirement, = config["project"]["optional-dependencies"]["similarity"]
+          print("revision=" + requirement.rsplit("@", 1)[1])
+          PYTHON
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: traitlab/labelfirst
+          ref: ${{ steps.labelfirst.outputs.revision }}
+          path: .integration/labelfirst
+          token: ${{ secrets.LABELFIRST_READ_TOKEN }}
+          persist-credentials: false
+      # The small optional lock adds only packages absent from the base lock. Installing
+      # together prevents optional dependencies from silently replacing tested base pins.
+      - run: pip install --require-hashes -r requirements.lock -r requirements-similarity.lock
+      - run: pip install --no-deps -e .integration/labelfirst
+      - run: pip check
+      - name: Verify the real LabelFirst integration
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -m labelfirst tests/test_labelfirst_integration.py
       - name: Read the where-to-blitz commit the code expects
         id: wtb
         run: |
@@ -81,6 +122,8 @@ jobs:
       # One build date for every step, even if the run crosses midnight UTC.
       - run: echo "TODAY=$(date -u +%F)" >> "$GITHUB_ENV"
       - run: scripts/daily.sh fetch
+      - name: Fetch and verify the versioned embedding bundle
+        run: scripts/daily.sh fetch-embeddings
       - name: Build, check for leaks, replay
         env:
           WHAT_TO_ID_KEY: ${{ secrets.WHAT_TO_ID_KEY }}
