@@ -156,7 +156,7 @@ build() {
 
   local common=(--pool "$STATE/pool.parquet" --freeze "$TODAY" --d1 "$BLITZ_D1"
     --arms "$ARMS" --design rotation ${cap_args[@]+"${cap_args[@]}"} --key-env WHAT_TO_ID_KEY
-    --webapp-dir "$WTB_DIR" "${EMBEDDING_ARGS[@]}")
+    --webapp-dir "$WTB_DIR" ${EMBEDDING_ARGS[@]+"${EMBEDDING_ARGS[@]}"})
   rm -rf "$OUT/draft" "$OUT/final" "$OUT/ordering-cache"
   mkdir -p "$OUT/ordering-cache"
   chmod 700 "$OUT/ordering-cache"
@@ -173,7 +173,7 @@ build() {
   check_leaks
   $PY -m what_to_id.replay --pool "$STATE/days/pool-$TODAY.parquet" \
     --record "$STATE/days/build-$TODAY.json" --served-log "$STATE/served.parquet" \
-    --webapp-dir "$WTB_DIR" --key-env WHAT_TO_ID_KEY "${EMBEDDING_ARGS[@]}"
+    --webapp-dir "$WTB_DIR" --key-env WHAT_TO_ID_KEY ${EMBEDDING_ARGS[@]+"${EMBEDDING_ARGS[@]}"}
 }
 
 save() {
