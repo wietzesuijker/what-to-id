@@ -114,3 +114,33 @@ def test_bundle_eligibility_is_fetched_and_saved(daily):
     assert result.returncode == 0, result.stderr
     downloads = [call for call in calls if call[:2] == ["release", "download"]]
     assert any(call[call.index("-p") + 1] == eligibility.name for call in downloads)
+
+
+def test_build_stops_on_edited_cell_scores(tmp_path):
+    from what_to_id.manifest import WHERE_TO_BLITZ_REF
+
+    wtb = tmp_path / "wtb"
+    wtb.mkdir()
+    (wtb / "provenance.json").write_text("{}")
+    git = tmp_path / "bin" / "git"
+    git.parent.mkdir()
+    # HEAD matches the pin, but the score files differ from it.
+    sha = WHERE_TO_BLITZ_REF.split("@")[1]
+    git.write_text(f'#!/bin/sh\ncase "$*" in *diff*) exit 1;; esac\nprintf "%s\\n" {sha}\n')
+    git.chmod(0o755)
+    env = {
+        **os.environ,
+        "PATH": str(git.parent) + os.pathsep + os.environ["PATH"],
+        "PYTHON": sys.executable,
+        "WHAT_TO_ID_KEY": "00" * 32,
+        "BLITZ_D1": "2026-11-01",
+        "WTB_DIR": str(wtb),
+        "STATE_DIR": str(tmp_path / "state"),
+        "OUT_DIR": str(tmp_path / "out"),
+    }
+    root = Path(__file__).resolve().parents[1]
+    run = subprocess.run(
+        ["bash", "scripts/daily.sh", "build"], cwd=root, env=env, text=True, capture_output=True
+    )
+    assert run.returncode == 1
+    assert "local changes to the cell scores" in run.stderr

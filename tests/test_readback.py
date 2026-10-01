@@ -113,6 +113,14 @@ def test_outcomes(tiny):
     assert out.loc["B", "weighted_rg"] == 0.0
 
 
+def test_outcomes_weights_by_served_score(tiny):
+    pool, assign, obs = tiny
+    served = assign.assign(cell_score=[3.0, 0.0, 2.0, 1.0])
+    out = readback.outcomes(obs, served, pool).set_index("arm")
+    # Record 1 is research grade: the served score 3.0 wins over the pool's 0.5.
+    assert out.loc["A", "weighted_rg"] == 3.0
+
+
 def test_outcomes_without_cell_score(tiny):
     pool, assign, obs = tiny
     out = readback.outcomes(obs, assign, pool.drop(columns="cell_score"))

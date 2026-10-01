@@ -128,8 +128,13 @@ def outcomes(
     assign_df: pd.DataFrame | None,
     pool_df: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Per-arm outcome shares. ``obs_df=None`` falls back to the pool's own ident counts."""
+    """Per-arm outcome shares. ``obs_df=None`` falls back to the pool's own ident counts.
+
+    ``weighted_rg`` uses the served log's ``cell_score`` when ``assign_df`` carries one, so each
+    record is weighted by the score that ordered it; otherwise the pool's.
+    """
     arms = _arms(assign_df, pool_df)
+    scores = assign_df if assign_df is not None and "cell_score" in assign_df.columns else pool_df
     if obs_df is None:
         obs_df = pd.DataFrame(
             {
@@ -140,9 +145,9 @@ def outcomes(
             }
         )
     df = arms.merge(obs_df, on="id", how="left")
-    score_col = "cell_score" if "cell_score" in pool_df.columns else None
+    score_col = "cell_score" if "cell_score" in scores.columns else None
     if score_col:
-        df = df.merge(pool_df[["id", score_col]].drop_duplicates("id"), on="id", how="left")
+        df = df.merge(scores[["id", score_col]].drop_duplicates("id"), on="id", how="left")
     ident = pd.to_numeric(df["ident_count"], errors="coerce").fillna(0).astype(float)
     is_rg = df["quality_grade"].eq("research")
     df = df.assign(

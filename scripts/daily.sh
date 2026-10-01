@@ -91,6 +91,8 @@ check_wtb() {
   want=$($PY -c "from what_to_id.manifest import WHERE_TO_BLITZ_REF as r; print(r.split('@')[1])")
   have=$(git -C "$WTB_DIR" rev-parse HEAD)
   [ "$want" = "$have" ] || die "where-to-blitz is at $have, the code expects $want"
+  # The commit pins the score files only if the checkout has no local edits to them.
+  git -C "$WTB_DIR" diff --quiet HEAD -- . || die "$WTB_DIR has local changes to the cell scores"
 }
 
 check_leaks() {
