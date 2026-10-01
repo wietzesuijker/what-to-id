@@ -10,6 +10,7 @@ from what_to_id.page import ARM_WORDS
 from what_to_id.page_method import ORDER_DETAIL, ORDER_TEXT, method_section
 from what_to_id.page_rotation import (
     ROTATION_JS,
+    _rotation_data,
     render_rotation_index,
     write_rotation_site,
 )
@@ -478,3 +479,12 @@ def test_map_link_carries_the_picked_group():
     assert "setMap(group)" in html and "setMap(null)" in html
     plain = render_rotation_index(_manifest(), title="t")
     assert 'id="mapLink"' not in plain
+
+
+def test_batches_past_999_keep_their_order():
+    batches = {
+        f"recency-Aves-{i:03d}": {"arm": "recency", "group": "Aves", "url": f"u{i}", "ids": [i]}
+        for i in (1000, 101, 999, 0, 1001, 100)
+    }
+    m = replace(_manifest(), batches=batches)
+    assert _rotation_data(m) == {"B": {"Aves": ["u0", "u100", "u101", "u999", "u1000", "u1001"]}}

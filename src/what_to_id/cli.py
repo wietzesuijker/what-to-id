@@ -17,7 +17,7 @@ import pandas as pd
 from what_to_id.arms import Arm, build_arm, load_embeddings
 from what_to_id.artifacts import build_inputs, resolve_embeddings, validate_coverage
 from what_to_id.assign import assign, assign_keyed
-from what_to_id.batches import build_batches, identify_url
+from what_to_id.batches import batch_key, build_batches, identify_url
 from what_to_id.cells import WEBAPP_DIR, score_records
 from what_to_id.labelfirst_adapter import labelfirst_provenance
 from what_to_id.manifest import (
@@ -207,7 +207,8 @@ def build(args: argparse.Namespace) -> Path:
                 row["novelty"],
             )
     batches = {}
-    for bid, sub in batches_df.groupby("batch_id", sort=True):
+    by_batch = batches_df.groupby("batch_id", sort=False)
+    for bid, sub in sorted(by_batch, key=lambda kv: batch_key(kv[0])):
         ids = [int(i) for i in sub.sort_values("position")["id"]]
         batches[bid] = {
             "arm": str(sub["arm"].iloc[0]),

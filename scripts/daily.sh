@@ -19,7 +19,12 @@ OUT=${OUT_DIR:-out}
 TODAY=${TODAY:-$(date -u +%F)}
 D1=${D1:-2025-01-01}
 STATE_TAG=${STATE_TAG:-pool-state}
-MAX_BATCHES=${MAX_BATCHES:-20}
+# MAX_BATCHES caps each list and taxon group at that many batches; empty serves every list in
+# full. REFRESH_BATCHES is how deep the daily refresh asks iNaturalist which served records are
+# closed: each list's first N batches, which keeps the requests near 400 a day however long the
+# lists are. Records further back stay unchecked, and Identify hides any that no longer need an ID.
+MAX_BATCHES=${MAX_BATCHES-20}
+REFRESH_BATCHES=${REFRESH_BATCHES:-20}
 ARMS=${ARMS:-recency,gap_first,similarity,novelty}
 EMBEDDING_BUNDLE=${EMBEDDING_BUNDLE:-data/embedding-bundle}
 PY=${PYTHON:-python}
@@ -28,6 +33,10 @@ export PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}"
 die() {
   echo "daily: $*" >&2
   exit 1
+}
+
+positive_int() {
+  [[ $2 =~ ^[1-9][0-9]*$ ]] || die "$1 must be a whole number >= 1, not '$2'"
 }
 
 state_release_exists() {
@@ -107,9 +116,8 @@ check_leaks() {
   fi
   $PY - "$STATE/served.parquet" "$STATE/days/build-$TODAY.json" <<'EOF'
 import json, sys
-import pandas as pd
-served = pd.read_parquet(sys.argv[1])
-assert "arm" not in served.columns, "the served log names lists"
+import pyarrow.parquet as pq
+assert "arm" not in pq.read_schema(sys.argv[1]).names, "the served log names lists"
 record = json.load(open(sys.argv[2]))
 for k in ("arm_labels", "batches"):
     assert k not in record, f"the build record carries {k}"
@@ -119,6 +127,12 @@ EOF
 build() {
   [ -n "${WHAT_TO_ID_KEY:-}" ] || die "WHAT_TO_ID_KEY is not set"
   : "${BLITZ_D1:?set BLITZ_D1, the blitz start date (YYYY-MM-DD)}"
+  local cap_args=()
+  if [ -n "$MAX_BATCHES" ]; then
+    positive_int MAX_BATCHES "$MAX_BATCHES"
+    cap_args=(--max-batches "$MAX_BATCHES")
+  fi
+  positive_int REFRESH_BATCHES "$REFRESH_BATCHES"
   check_wtb
   embedding_args
 
@@ -141,14 +155,15 @@ build() {
   fi
 
   local common=(--pool "$STATE/pool.parquet" --freeze "$TODAY" --d1 "$BLITZ_D1"
-    --arms "$ARMS" --design rotation --max-batches "$MAX_BATCHES" --key-env WHAT_TO_ID_KEY
+    --arms "$ARMS" --design rotation ${cap_args[@]+"${cap_args[@]}"} --key-env WHAT_TO_ID_KEY
     --webapp-dir "$WTB_DIR" "${EMBEDDING_ARGS[@]}")
   rm -rf "$OUT/draft" "$OUT/final" "$OUT/ordering-cache"
   mkdir -p "$OUT/ordering-cache"
   chmod 700 "$OUT/ordering-cache"
   $PY -m what_to_id.cli build "${common[@]}" --out "$OUT/draft" --ordering-cache "$OUT/ordering-cache"
   if [ "${OFFLINE:-}" != 1 ]; then
-    $PY -m what_to_id.pool_state refresh --pool "$STATE/pool.parquet" --ids "$OUT/draft/batches.parquet" "${eligibility_args[@]}"
+    $PY -m what_to_id.pool_state refresh --pool "$STATE/pool.parquet" --ids "$OUT/draft/batches.parquet" \
+      --front "$REFRESH_BATCHES" "${eligibility_args[@]}"
   fi
   $PY -m what_to_id.cli build "${common[@]}" --out "$OUT/final" --ordering-cache "$OUT/ordering-cache" --served-log "$STATE/served.parquet"
 

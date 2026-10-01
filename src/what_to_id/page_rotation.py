@@ -17,6 +17,7 @@ import json
 from html import escape
 from pathlib import Path
 
+from what_to_id.batches import batch_key
 from what_to_id.manifest import Manifest
 from what_to_id.page import ARM_WORDS, group_name
 from what_to_id.page_method import METHOD_CSS, METHOD_JS, method_section
@@ -334,7 +335,7 @@ function startOver(state, group) {
 def _rotation_data(manifest: Manifest) -> dict[str, dict[str, list[str]]]:
     """label -> group -> ordered Identify URLs, in the order batches were cut."""
     data: dict[str, dict[str, list[str]]] = {}
-    for _bid, b in sorted(manifest.batches.items()):
+    for _bid, b in sorted(manifest.batches.items(), key=lambda kv: batch_key(kv[0])):
         label = manifest.arm_labels[b["arm"]]
         data.setdefault(label, {}).setdefault(str(b["group"]), []).append(b["url"])
     return data

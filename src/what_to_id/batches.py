@@ -96,6 +96,15 @@ def _order(
     return order
 
 
+def batch_key(batch_id: str) -> tuple[str, int]:
+    """Sort key for a batch_id: its (arm, group) prefix, then its batch number as a number.
+
+    A plain string sort puts batch 1000 before batch 101, once a list has more than 1,000 batches.
+    """
+    prefix, _, index = batch_id.rpartition("-")
+    return prefix, int(index)
+
+
 def build_batches(
     pool: pd.DataFrame,
     assign_df: pd.DataFrame,

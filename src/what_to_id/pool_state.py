@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from what_to_id.batches import batch_key
 from what_to_id.inat import (
     COLUMNS,
     DTYPES,
@@ -145,9 +146,16 @@ def _cmd_update(a: argparse.Namespace) -> int:
 
 
 def _cmd_refresh(a: argparse.Namespace) -> int:
-    pool = load_pool(a.pool)
     served = pd.read_parquet(a.ids, engine="pyarrow")
+    if a.front is not None:
+        if a.front < 1:
+            raise SystemExit("--front must be >= 1")
+        if "batch_id" not in served:
+            raise SystemExit(f"{a.ids} has no batch_id column; --front needs the build's batches")
+        number = served["batch_id"].map(lambda b: batch_key(b)[1])
+        served = served[number < a.front]
     checked = served["id"].astype("int64").tolist()
+    pool = load_pool(a.pool)
     eligibility = _eligibility(a.eligibility) if a.eligibility is not None else None
     open_ids = still_open(checked)
     updated = drop_closed(pool, checked, open_ids)
@@ -269,6 +277,12 @@ def main(argv: list[str] | None = None) -> int:
     p_refresh.add_argument("--pool", required=True, type=Path)
     p_refresh.add_argument("--ids", required=True, type=Path, help="parquet with an id column")
     p_refresh.add_argument("--eligibility", type=Path, help="prepared snapshot exclusion state")
+    p_refresh.add_argument(
+        "--front",
+        type=int,
+        default=None,
+        help="check only ids in each list's first N batches; unchecked ids are kept",
+    )
     p_refresh.set_defaults(func=_cmd_refresh)
 
     p_sync = sub.add_parser("sync", help="apply every change since the last run (map pool)")

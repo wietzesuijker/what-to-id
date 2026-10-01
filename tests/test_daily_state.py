@@ -114,3 +114,26 @@ def test_bundle_eligibility_is_fetched_and_saved(daily):
     assert result.returncode == 0, result.stderr
     downloads = [call for call in calls if call[:2] == ["release", "download"]]
     assert any(call[call.index("-p") + 1] == eligibility.name for call in downloads)
+
+
+@pytest.mark.parametrize(
+    "name,value", [("MAX_BATCHES", "0"), ("MAX_BATCHES", "20x"), ("REFRESH_BATCHES", "0")]
+)
+def test_build_rejects_a_bad_cap_or_refresh_depth(tmp_path, name, value):
+    env = {
+        **os.environ,
+        "STATE_DIR": str(tmp_path),
+        "WHAT_TO_ID_KEY": "k",
+        "BLITZ_D1": "2026-11-01",
+        name: value,
+    }
+    result = subprocess.run(
+        ["bash", "scripts/daily.sh", "build"],
+        cwd=Path(__file__).resolve().parents[1],
+        env=env,
+        text=True,
+        capture_output=True,
+        timeout=10,
+    )
+    assert result.returncode != 0
+    assert f"{name} must be a whole number" in result.stderr

@@ -2,7 +2,16 @@ import pytest
 
 from what_to_id.arms import GapFirst, Recency
 from what_to_id.assign import assign
-from what_to_id.batches import IDENTIFY_URL, build_batches, cut_batches, identify_url
+from what_to_id.batches import IDENTIFY_URL, batch_key, build_batches, cut_batches, identify_url
+
+
+def test_batch_key_sorts_batch_numbers_as_numbers():
+    ids = ["recency-Aves-1000", "recency-Aves-101", "gap_first-All_biodiversity-002"]
+    assert sorted(ids, key=batch_key) == [
+        "gap_first-All_biodiversity-002",
+        "recency-Aves-101",
+        "recency-Aves-1000",
+    ]
 
 
 def test_cut_batches():

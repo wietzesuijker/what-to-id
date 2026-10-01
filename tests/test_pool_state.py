@@ -145,6 +145,47 @@ def test_cmd_refresh_drops_closed_ids(tmp_path, monkeypatch):
     assert sorted(result["id"]) == [1, 3, 4]
 
 
+def test_cmd_refresh_front_checks_only_the_first_batches(tmp_path, monkeypatch):
+    pool = make_pool(4)
+    pool.loc[:, "id"] = [1, 2, 3, 4]
+    pool_path = tmp_path / "pool.parquet"
+    pool.to_parquet(pool_path, index=False)
+    batches = pd.DataFrame(
+        {
+            "batch_id": ["recency-Aves-000", "recency-Aves-001", "recency-Aves-1000", "x-Aves-002"],
+            "id": pd.array([1, 2, 3, 4], dtype="int64"),
+        }
+    )
+    batches_path = tmp_path / "batches.parquet"
+    batches.to_parquet(batches_path, index=False)
+    captured = {}
+
+    def fake_still_open(ids, *, session=None):
+        captured["ids"] = sorted(ids)
+        return set()
+
+    monkeypatch.setattr(pool_state, "still_open", fake_still_open)
+    args = ["refresh", "--pool", str(pool_path), "--ids", str(batches_path), "--front", "2"]
+    assert pool_state.main(args) == 0
+    assert captured["ids"] == [1, 2]
+    assert sorted(pd.read_parquet(pool_path)["id"]) == [3, 4]
+
+
+@pytest.mark.parametrize("front", ["0", "-1"])
+def test_cmd_refresh_rejects_an_empty_front(tmp_path, front):
+    ids = tmp_path / "batches.parquet"
+    pd.DataFrame({"batch_id": ["a-Aves-000"], "id": [1]}).to_parquet(ids)
+    with pytest.raises(SystemExit, match="--front"):
+        pool_state.main(["refresh", "--pool", str(ids), "--ids", str(ids), "--front", front])
+
+
+def test_cmd_refresh_front_needs_batch_ids(tmp_path):
+    ids = tmp_path / "ids.parquet"
+    pd.DataFrame({"id": [1]}).to_parquet(ids)
+    with pytest.raises(SystemExit, match="batch_id"):
+        pool_state.main(["refresh", "--pool", str(ids), "--ids", str(ids), "--front", "1"])
+
+
 def test_prepared_snapshot_retains_closures_across_days_and_reconciles_new_bundle(
     tmp_path, monkeypatch
 ):

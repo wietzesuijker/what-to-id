@@ -199,8 +199,8 @@ def replay(
         rebuilt = pd.read_parquet(rerun_log)
 
     build_date = str(record["freeze"])
-    log_df = pd.read_parquet(served_log_path)
-    expected = log_df[log_df["build_date"] == build_date]
+    # Only this build's rows: the log holds every build, a row per served record each.
+    expected = pd.read_parquet(served_log_path, filters=[("build_date", "==", build_date)])
 
     mismatches = _compare(expected, rebuilt)
     ok = mismatches.empty and len(expected) == len(rebuilt)
