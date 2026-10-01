@@ -65,3 +65,19 @@ def test_reads_the_served_log_file(tmp_path):
 def test_rejects_an_empty_rule(front, after, days):
     with pytest.raises(ValueError, match="rest needs"):
         resting_ids(_log({}), "2026-11-04", front=front, after=after, days=days)
+
+
+def test_reading_the_log_keeps_only_front_rows_and_matches_the_frame(tmp_path):
+    path = tmp_path / "served.parquet"
+    log = pd.concat(
+        [
+            _log({"2026-11-01": [1, 2], "2026-11-02": [1, 2], "2026-11-03": [1, 2]}, batch_index=0),
+            _log({"2026-11-01": [3], "2026-11-02": [3], "2026-11-03": [3]}, batch_index=5),
+        ]
+    )
+    log.to_parquet(path)
+    for front in (1, 6):
+        assert resting_from_log(path, "2026-11-04", front=front) == resting_ids(
+            log, "2026-11-04", front=front
+        )
+    assert resting_from_log(path, "2026-11-04", front=1) == {1, 2}

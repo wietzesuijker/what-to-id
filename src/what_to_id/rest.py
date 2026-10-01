@@ -70,5 +70,9 @@ def resting_from_log(
     path = Path(path)
     if not path.exists():
         return set()
-    served = pd.read_parquet(path, columns=["build_date", "batch_index", "id"])
+    # Only the front batches count, so read only their rows: with every list served in full the
+    # log gains a row per pool record per build, and the front is a small slice of it.
+    served = pd.read_parquet(
+        path, columns=["build_date", "batch_index", "id"], filters=[("batch_index", "<", front)]
+    )
     return resting_ids(served, build_date, front=front, after=after, days=days)
