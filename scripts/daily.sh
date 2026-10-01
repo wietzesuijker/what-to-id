@@ -142,7 +142,7 @@ build() {
 
   local common=(--pool "$STATE/pool.parquet" --freeze "$TODAY" --d1 "$BLITZ_D1"
     --arms "$ARMS" --design rotation --max-batches "$MAX_BATCHES" --key-env WHAT_TO_ID_KEY
-    --webapp-dir "$WTB_DIR" "${EMBEDDING_ARGS[@]}")
+    --webapp-dir "$WTB_DIR" --rest-log "$STATE/served.parquet" "${EMBEDDING_ARGS[@]}")
   rm -rf "$OUT/draft" "$OUT/final" "$OUT/ordering-cache"
   mkdir -p "$OUT/ordering-cache"
   chmod 700 "$OUT/ordering-cache"

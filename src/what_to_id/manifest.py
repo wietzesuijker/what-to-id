@@ -118,6 +118,7 @@ class Manifest:
     reference_sha256: str | None = None
     backbone: str | None = None
     max_batches: int | None = None
+    rest: dict | None = None
     served_rows: int = 0
     created_at: str = field(default_factory=utc_now_iso)
     batches: dict[str, dict] = field(default_factory=dict)
@@ -202,6 +203,7 @@ PUBLIC_BUILD_RECORD_FIELDS = (
     "seed",
     "batch_size",
     "max_batches",
+    "rest",
     "design",
     "assignment",
     "arms",

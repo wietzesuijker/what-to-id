@@ -94,3 +94,38 @@ def test_compare_refuses_duplicate_multiplicity():
     b = dict.fromkeys(COLUMNS, "b")
     with pytest.raises(ReplayError, match="duplicate"):
         _compare(pd.DataFrame([a, a, b]), pd.DataFrame([a, b, b]))
+
+
+def test_replay_rebuilds_a_day_with_records_at_rest(tmp_path, webapp_dir, monkeypatch):
+    monkeypatch.setenv("WHAT_TO_ID_KEY", KEY)
+    pool_path = tmp_path / "pool.parquet"
+    make_pool(300, seed=5).to_parquet(pool_path, index=False)
+    log_path = tmp_path / "state" / "served.parquet"
+    rest = ["--rest-log", str(log_path), "--rest-front", "1"]
+    days = ["2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06"]
+    for day in days:
+        assert _keyed_build(pool_path, webapp_dir, tmp_path / day, day, log_path, rest) == 0
+
+    served = pd.read_parquet(log_path)
+    first = served[served["batch_index"] == 0]
+    front = {d: set(first.loc[first["build_date"] == d, "id"]) for d in days}
+    always = front[days[0]] & front[days[1]] & front[days[2]]
+    assert always
+    record = json.loads((tmp_path / days[3] / "build_record.json").read_text())
+    assert record["rest"] == {"front": 1, "after": 3, "days": 7, "rows": len(always)}
+
+    # Every record is still served on the rest day, the resting ones behind the rest of their list.
+    last = served[served["build_date"] == days[3]]
+    assert set(last["id"]) == set(served.loc[served["build_date"] == days[0], "id"])
+    for _, lst in last.groupby(["label", "group"]):
+        rank = lst.sort_values(["batch_index", "position"])["id"].isin(always).to_numpy()
+        assert not (rank[:-1] & ~rank[1:]).any()
+
+    result = replay(
+        pool_path,
+        tmp_path / days[3] / "build_record.json",
+        log_path,
+        webapp_dir,
+        key=bytes.fromhex(KEY),
+    )
+    assert result.ok and result.expected_rows > 0

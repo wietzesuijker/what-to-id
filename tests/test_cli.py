@@ -239,7 +239,7 @@ def test_build_default_design_is_sets(tmp_path, webapp_dir):
         assert (out / "site" / name).exists()
 
 
-def _keyed_build(pool_path, webapp_dir, out, freeze, log_path):
+def _keyed_build(pool_path, webapp_dir, out, freeze, log_path, extra=()):
     return main(
         [
             "build",
@@ -261,6 +261,7 @@ def _keyed_build(pool_path, webapp_dir, out, freeze, log_path):
             str(log_path),
             "--out",
             str(out),
+            *extra,
         ]
     )
 

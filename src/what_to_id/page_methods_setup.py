@@ -31,6 +31,7 @@ from what_to_id.page_order_text import (
     primary_text,
 )
 from what_to_id.page_svg import fmt, range_words
+from what_to_id.rest import REST_AFTER, REST_DAYS, REST_FRONT
 
 _SETUP = "docs/protocol.md#proposed-set-up-for-bc"
 
@@ -195,7 +196,9 @@ def records_section(m: Manifest, f: dict, doc: Doc) -> str:
         f"{fmt(f['served_rows'])} of them in {fmt(f['n_batches'])} batches.</p>"
         f"<p>This page is one build, of records added up to {m.freeze}, and it does not change "
         "by itself. In the blitz, a daily job adds new records, drops served records that no "
-        "longer need an ID, and builds again each day "
+        f"longer need an ID, moves to the back of its list for {REST_DAYS} days a record "
+        f"served in the first {REST_FRONT} batches on {REST_AFTER} builds in a row that still "
+        "needs one, and builds again each day "
         f"({a('README.md#how-it-works', 'the README')}). The daily script defaults to all four "
         "lists with rotation. The image-based lists require embeddings prepared separately; "
         "the daily build checks the supplied files before using them.</p>"

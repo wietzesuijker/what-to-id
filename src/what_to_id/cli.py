@@ -36,6 +36,7 @@ from what_to_id.manifest import (
 from what_to_id.page import write_site
 from what_to_id.page_map import MAP_NAME, write_map
 from what_to_id.page_rotation import write_rotation_site
+from what_to_id.rest import REST_AFTER, REST_DAYS, REST_FRONT, resting_from_log
 from what_to_id.served_log import append_served, served_rows
 from what_to_id.signals import batch_signals, signals_by_batch
 
@@ -168,6 +169,17 @@ def build(args: argparse.Namespace) -> Path:
             sort_keys=True,
         )
     arms = _make_arms(arm_names, args.batch_size, emb, ref)
+    resting: set[int] = set()
+    if args.rest_log:
+        resting = resting_from_log(
+            args.rest_log,
+            args.freeze,
+            front=args.rest_front,
+            after=args.rest_after,
+            days=args.rest_days,
+        )
+        resting &= set(pool["id"].astype("int64"))
+        log.info("%d records at rest", len(resting))
     batches_df = build_batches(
         pool,
         assign_df,
@@ -177,6 +189,7 @@ def build(args: argparse.Namespace) -> Path:
         max_batches=args.max_batches,
         cache_dir=Path(args.ordering_cache) if args.ordering_cache else None,
         cache_context=cache_context,
+        resting=resting,
     )
     del arms  # Release selection caches before loading embeddings for batch signals.
 
@@ -229,6 +242,16 @@ def build(args: argparse.Namespace) -> Path:
         reference_sha256=ref_sha,
         backbone=backbone,
         max_batches=args.max_batches,
+        rest=(
+            {
+                "front": args.rest_front,
+                "after": args.rest_after,
+                "days": args.rest_days,
+                "rows": len(resting),
+            }
+            if args.rest_log
+            else None
+        ),
         served_rows=int(len(batches_df)),
         created_at=args.created_at or utc_now_iso(),
         batches=batches,
@@ -319,6 +342,16 @@ def make_parser() -> argparse.ArgumentParser:
         default=None,
         help="append this build's served records, by list letter, to this parquet",
     )
+    b.add_argument(
+        "--rest-log",
+        default=None,
+        help="served log to read earlier builds from: a record in the first --rest-front "
+        "batches of its list on --rest-after builds in a row goes to the back of its list for "
+        "the next --rest-days days",
+    )
+    b.add_argument("--rest-front", type=int, default=REST_FRONT)
+    b.add_argument("--rest-after", type=int, default=REST_AFTER)
+    b.add_argument("--rest-days", type=int, default=REST_DAYS)
     b.add_argument("--ordering-cache", help="private run-local ordering cache; omit for replay")
     b.add_argument(
         "--created-at",
@@ -343,6 +376,11 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--batch-size must be >= 1")
     if args.max_batches is not None and args.max_batches < 1:
         raise SystemExit("--max-batches must be >= 1")
+    if (
+        getattr(args, "rest_log", None)
+        and min(args.rest_front, args.rest_after, args.rest_days) < 1
+    ):
+        raise SystemExit("--rest-front, --rest-after and --rest-days must be >= 1")
     args.func(args)
     return 0
 

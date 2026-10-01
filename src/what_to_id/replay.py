@@ -81,6 +81,7 @@ def _rerun(
     out: Path,
     served_log: Path,
     inputs: dict[str, str | None],
+    rest_log: Path | None = None,
 ) -> None:
     argv = [
         "build",
@@ -112,6 +113,14 @@ def _rerun(
             argv += ["--" + name.replace("_", "-"), str(spec)]
     if record.get("max_batches") is not None:
         argv += ["--max-batches", str(record["max_batches"])]
+    rest = record.get("rest")
+    if rest is not None:
+        if rest_log is None:
+            raise ReplayError("the record rested records; pass the served log it read")
+        # Rest reads only builds before this one, so the full log rests the same records.
+        argv += ["--rest-log", str(rest_log)]
+        argv += ["--rest-front", str(rest["front"]), "--rest-after", str(rest["after"])]
+        argv += ["--rest-days", str(rest["days"])]
     if record.get("assignment") == "keyed":
         os.environ[_RERUN_KEY_ENV] = key.hex()
         argv += ["--key-env", _RERUN_KEY_ENV]
@@ -195,7 +204,16 @@ def replay(
     # The rerun logs into a fresh served log of its own, through the same code path as the build.
     with tempfile.TemporaryDirectory() as tmp:
         rerun_log = Path(tmp) / "served.parquet"
-        _rerun(record, pool_path, webapp_dir, key, Path(tmp) / "out", rerun_log, inputs)
+        _rerun(
+            record,
+            pool_path,
+            webapp_dir,
+            key,
+            Path(tmp) / "out",
+            rerun_log,
+            inputs,
+            Path(served_log_path),
+        )
         rebuilt = pd.read_parquet(rerun_log)
 
     build_date = str(record["freeze"])

@@ -6,7 +6,7 @@ import hashlib
 import json
 import pickle
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, Sequence, Set
 from pathlib import Path
 from urllib.parse import urlencode
 from zipfile import BadZipFile
@@ -106,11 +106,14 @@ def build_batches(
     max_batches: int | None = None,
     cache_dir: Path | None = None,
     cache_context: str = "",
+    resting: Set[int] = frozenset(),
 ) -> pd.DataFrame:
     """One row per (batch, position, id); batch_id is f"{arm}-{group}-{i:03d}".
 
     max_batches keeps only the first max_batches batches of each (arm, group) cut, i.e. the
     highest-priority records of that arm's ordering. None (the default) keeps every batch.
+    Records in resting go after all others of their (arm, group), in the arm's own order of
+    the resting records, so the other records form batches as if the resting ones were absent.
     """
     if cache_dir is not None and not cache_context:
         raise ValueError("ordering cache requires an input and implementation context")
@@ -132,11 +135,23 @@ def build_batches(
     for arm_name in sorted(arms):
         arm = arms[arm_name]
         for group in sorted(np.unique(groups[pool_arm == arm_name])):
-            sub = pool[(pool_arm == arm_name) & (groups == group)].reset_index(drop=True)
-            order = _order(
-                arm, sub, seed=seed, size=size, cache_dir=cache_dir, cache_context=cache_context
-            )
-            ordered_ids = sub["id"].to_numpy(dtype=np.int64)[order]
+            sub = pool[(pool_arm == arm_name) & (groups == group)]
+            at_rest = sub["id"].isin(resting).to_numpy()
+            parts = []
+            for part in (sub[~at_rest], sub[at_rest]):
+                if part.empty:
+                    continue
+                part = part.reset_index(drop=True)
+                order = _order(
+                    arm,
+                    part,
+                    seed=seed,
+                    size=size,
+                    cache_dir=cache_dir,
+                    cache_context=cache_context,
+                )
+                parts.append(part["id"].to_numpy(dtype=np.int64)[order])
+            ordered_ids = np.concatenate(parts)
             if max_batches is not None:
                 ordered_ids = ordered_ids[: size * max_batches]
             cut = cut_batches(ordered_ids, size)
