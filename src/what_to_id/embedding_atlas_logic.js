@@ -12,9 +12,11 @@ const AtlasScope = (() => {
     return delta <= width + 1e-9;
   }
   function matches(records, {term = '', bounds = null, onlyInView = false,
-                             order = 'sample', hasReference = false} = {}) {
+                             order = 'sample', hasReference = false, onlyBrushed = false, brushedIndices = []} = {}) {
     const query = term.trim().toLocaleLowerCase();
-    const result = records.map((r, i) => ({r, i})).filter(({r}) =>
+    const brush = new Set(brushedIndices);
+    const result = records.map((r, i) => ({r, i})).filter(({r, i}) =>
+      (!onlyBrushed || brush.has(i)) &&
       (!onlyInView || inBounds(r, bounds)) &&
       `${r.name} ${r.id}`.toLocaleLowerCase().includes(query));
     if (order === 'reference' && hasReference) {
@@ -22,6 +24,19 @@ const AtlasScope = (() => {
     }
     return result;
   }
-  return {inBounds, matches};
+  function brushIndices(points, rectangle) {
+    if (!rectangle || rectangle.length !== 4 || !rectangle.every(Number.isFinite)) return [];
+    const [x0, y0, x1, y1] = rectangle;
+    const left = Math.min(x0, x1), right = Math.max(x0, x1);
+    const top = Math.min(y0, y1), bottom = Math.max(y0, y1);
+    return points.flatMap(([x, y], i) => Number.isFinite(x) && Number.isFinite(y) &&
+      x >= left && x <= right && y >= top && y <= bottom ? [i] : []);
+  }
+  function toggleIndex(indices, index) {
+    const result = new Set(indices);
+    if (result.has(index)) result.delete(index); else result.add(index);
+    return [...result].sort((a, b) => a - b);
+  }
+  return {inBounds, matches, brushIndices, toggleIndex};
 })();
 if (typeof module !== 'undefined') module.exports = AtlasScope;

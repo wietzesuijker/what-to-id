@@ -77,7 +77,12 @@ def group_payload(
             raise ValueError(f"{group}: candidate and reference dimensions differ")
         if not len(reference_ids):
             raise ValueError(f"{group}: reference cache is empty")
+        reference_group_verified_count = 0
         if reference_pool is not None:
+            known = reference_pool.loc[reference_pool.id.isin(reference_ids)]
+            if not known.iconic_taxon.eq(group).all():
+                raise ValueError(f"{group}: reference cache contains known cross-group IDs")
+            reference_group_verified_count = len(known)
             ref_rows = reference_pool.loc[reference_pool.iconic_taxon.eq(group)]
             reference_names = {
                 int(row.id): str(row.taxon_name)
@@ -95,6 +100,8 @@ def group_payload(
             reference_scores[start:stop] = scores[np.arange(len(scores)), best]
         reference = {
             "count": len(reference_ids),
+            "group_verified_count": reference_group_verified_count,
+            "group_unverified_count": len(reference_ids) - reference_group_verified_count,
             "candidate_overlap_count": int(np.isin(ids, reference_ids).sum()),
             "backbone": ref_backbone,
             "dimensions": int(ref_vectors.shape[1]),
@@ -168,8 +175,15 @@ def build(
             raise ValueError("reference pool requires id, iconic_taxon and taxon_name")
         if reference_pool.id.duplicated().any():
             raise ValueError("reference pool IDs must be unique")
+    groups = sorted(pool.iconic_taxon.dropna().unique())
+    if (
+        reference_embedding_pattern is not None
+        and len(groups) > 1
+        and "{group}" not in reference_embedding_pattern
+    ):
+        raise ValueError("multi-group reference embeddings require a {group} path pattern")
     payloads = []
-    for group in sorted(pool.iconic_taxon.dropna().unique()):
+    for group in groups:
         if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", group):
             raise ValueError(f"invalid life group: {group!r}")
         path = Path(embedding_pattern.format(group=group))

@@ -171,3 +171,37 @@ def test_reference_overlap_is_explicit_not_a_false_novelty_result(tmp_path):
     assert result["records"][0]["included_in_reference"] is True
     assert result["records"][0]["reference_distance"] == 0
     assert result["records"][1]["included_in_reference"] is False
+
+
+def test_rejects_known_cross_group_reference_vector_before_comparing(tmp_path):
+    pool, cache, _ = inputs(tmp_path)
+    path = tmp_path / "references.npz"
+    np.savez(path, ids=np.array([99]), E=np.array([[1, 0, 0]], dtype="f4"), backbone="test-encoder")
+    reference_pool = pd.DataFrame(
+        {"id": [99], "iconic_taxon": ["Plantae"], "taxon_name": ["Not a bird"]}
+    )
+    with pytest.raises(ValueError, match="cross-group"):
+        group_payload(pool, cache, "Aves", reference_path=path, reference_pool=reference_pool)
+
+
+def test_cache_only_reference_ids_explicitly_count_as_group_unverified(tmp_path):
+    pool, cache, _ = inputs(tmp_path)
+    reference_pool = pd.DataFrame({"id": [11], "iconic_taxon": ["Aves"], "taxon_name": ["A"]})
+    result = group_payload(pool, cache, "Aves", reference_path=cache, reference_pool=reference_pool)
+    assert result["reference"]["group_verified_count"] == 1
+    assert result["reference"]["group_unverified_count"] == 3
+
+
+def test_multigroup_build_requires_distinct_reference_pattern(tmp_path):
+    pool, _, _ = inputs(tmp_path)
+    pool.loc[0, "iconic_taxon"] = "Plantae"
+    path = tmp_path / "pool.parquet"
+    pool.to_parquet(path)
+    with pytest.raises(ValueError, match=r"require a \{group\}"):
+        build(
+            path,
+            str(tmp_path / "{group}.npz"),
+            tmp_path / "site",
+            snapshot_date="2026-09-11",
+            reference_embedding_pattern=str(tmp_path / "shared.npz"),
+        )

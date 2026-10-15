@@ -80,3 +80,58 @@ def test_group_changes_do_not_reuse_previous_groups_observations():
 
 def test_no_map_bounds_cannot_offer_viewport_matches():
     assert evaluate('scope.matches([{id:1,name:"Bird",lon:0,lat:0}], {onlyInView:true})') == []
+
+
+@pytest.mark.parametrize("rectangle", [[0, 0, 10, 10], [10, 10, 0, 0]])
+def test_brush_geometric_boundaries_and_reverse_drag(rectangle):
+    points = [[0, 0], [10, 10], [5, 5], [-0.01, 5], [5, 10.01]]
+    assert evaluate(f"scope.brushIndices({json.dumps(points)}, {json.dumps(rectangle)})") == [
+        0,
+        1,
+        2,
+    ]
+
+
+def test_empty_or_cleared_brush_has_no_geometric_members():
+    assert evaluate("scope.brushIndices([[5,5]], null)") == []
+    assert evaluate("scope.brushIndices([[5,5]], [0,0,1,1])") == []
+    assert evaluate("scope.brushIndices([[5,5]], [0,0,NaN,10])") == []
+
+
+def test_brush_intersects_viewport_search_and_reference_order_then_clear_recovers():
+    records = [
+        dict(id=1, name="Bird A", lon=-123, lat=49, reference_distance=0.2),
+        dict(id=2, name="Bird B", lon=-123, lat=49, reference_distance=0.9),
+        dict(id=3, name="Bird outside view", lon=-100, lat=49, reference_distance=1.1),
+        dict(id=4, name="Different taxon", lon=-123, lat=49, reference_distance=0.8),
+        dict(id=5, name="Bird outside brush", lon=-123, lat=49, reference_distance=1.5),
+    ]
+    options = dict(
+        onlyBrushed=True,
+        brushedIndices=[0, 1, 2, 3],
+        onlyInView=True,
+        bounds=[-124, 48, -122, 50],
+        term="Bird",
+        order="reference",
+        hasReference=True,
+    )
+    result = evaluate(f"scope.matches({json.dumps(records)}, {json.dumps(options)})")
+    assert [x["r"]["id"] for x in result] == [2, 1]
+    options["brushedIndices"] = []
+    assert evaluate(f"scope.matches({json.dumps(records)}, {json.dumps(options)})") == []
+    options["onlyBrushed"] = False
+    result = evaluate(f"scope.matches({json.dumps(records)}, {json.dumps(options)})")
+    assert [x["r"]["id"] for x in result] == [5, 2, 1]
+
+
+def test_keyboard_set_membership_matches_brush_scope_without_mutating_input():
+    assert evaluate("scope.toggleIndex([0,2], 1)") == [0, 1, 2]
+    assert evaluate("scope.toggleIndex([0,2], 2)") == [0]
+    assert evaluate("scope.toggleIndex([0], 0)") == []
+    assert evaluate(
+        "(()=>{const initial=Object.freeze([0]);return scope.toggleIndex(initial,1);})()"
+    ) == [0, 1]
+    assert evaluate(
+        'scope.matches([{id:1,name:"A"},{id:2,name:"B"}], '
+        "{onlyBrushed:true, brushedIndices:scope.toggleIndex([],1)}).map(x=>x.r.id)"
+    ) == [2]
