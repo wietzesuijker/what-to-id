@@ -301,3 +301,44 @@ def test_small_and_rank_deficient_representation_has_finite_neutral_channels(vec
     assert np.isfinite(xy).all() and np.isfinite(rgb).all()
     assert np.isfinite(variance2) and np.isfinite(metadata["variance_retained"])
     assert (rgb[:, neutral_axes] == 128).all()
+
+
+def test_map_first_default_keeps_advanced_controls_and_projection_optional():
+    from html.parser import HTMLParser
+
+    class Layout(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.stack = []
+            self.elements = {}
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            ident = attrs.get("id")
+            if ident:
+                assert ident not in self.elements, f"duplicate control ID: {ident}"
+                self.elements[ident] = (attrs, [row[1] for row in self.stack])
+            if tag not in {"input", "meta", "link", "img", "br", "hr"}:
+                self.stack.append((tag, ident))
+
+        def handle_endtag(self, tag):
+            for index in range(len(self.stack) - 1, -1, -1):
+                if self.stack[index][0] == tag:
+                    del self.stack[index:]
+                    break
+
+    from pathlib import Path
+
+    html = (Path(__file__).parents[1] / "src/what_to_id/embedding_atlas.html").read_text()
+    layout = Layout()
+    layout.feed(html)
+    assert "hidden" in layout.elements["projection-pane"][0]
+    assert layout.elements["projection-toggle"][0]["aria-expanded"] == "false"
+    assert "open" not in layout.elements["advanced"][0]
+    for control in ["model-nav", "color-mode", "order", "unfamiliar", "only-view"]:
+        assert "advanced" in layout.elements[control][1]
+    for control in ["group", "search", "fit", "record"]:
+        assert "advanced" not in layout.elements[control][1]
+    assert html.index('id="details"') < html.index('id="projection-pane"')
+    assert "Canada · Wildlife &amp; plants" in html
+    assert "https://wietzesuijker.github.io/bci-dashboard/crownfirst-atlas.html" in html
