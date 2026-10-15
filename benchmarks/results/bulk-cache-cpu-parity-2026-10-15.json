@@ -1,0 +1,11 @@
+{
+  "rows": 64,
+  "groups": {
+    "Actinopterygii": 42,
+    "Reptilia": 22
+  },
+  "cosine_min": 0.9999999990452365,
+  "cosine_mean": 0.9999999999440454,
+  "max_component_abs_difference": 6.085087079554796e-06,
+  "caveat": "ID/group/photoURL identity verified against old pool; photo bytes not verified equal. Deterministic lowest-ID sample covers only two groups; not comprehensive encoder parity."
+}

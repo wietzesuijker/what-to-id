@@ -1,0 +1,120 @@
+{
+  "status": "verified",
+  "groups": {
+    "Actinopterygii": {
+      "status": "verified",
+      "rows": 4073,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "145362b1984e7a0d72812d93fa94a8e38a4e6f5752ef045c435b6ad1adef14c1",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Amphibia": {
+      "status": "verified",
+      "rows": 2015,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "113d24db6fb5b78455dc14c36dee7cd4ee22559e4f485f517465834b91fd80a6",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Arachnida": {
+      "status": "verified",
+      "rows": 43857,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "74aea023d7a1bad7ddd6fdde04e864b310578a56567c8964298cd6c7f416f2e7",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Aves": {
+      "status": "verified",
+      "rows": 26256,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "0910273e417794fd3f09762425cfa2677a3abba5e6cda39d08130bc0655b3036",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Fungi": {
+      "status": "verified",
+      "rows": 222547,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "77f4ebf0ca9527e9d4b3f3b046394060a000438cb661e188eb287e9ee8934c69",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Insecta": {
+      "status": "verified",
+      "rows": 286437,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "d410d96420145d7ad4e938ff8e65498408395f31ba1431b8e0bdd803324bec84",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Mammalia": {
+      "status": "verified",
+      "rows": 12719,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "295e29de0bda197bb71469daf83f11acfac0b4a7f138265df936964a03625649",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Mollusca": {
+      "status": "verified",
+      "rows": 29989,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "e559605d51172f2979b0e042db302870c5d36fb8ed0ad904f11304ea074714a2",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "reused"
+    },
+    "Plantae": {
+      "status": "verified",
+      "rows": 619317,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "b1fc59027e3550a93009468da313739d9b73578d8f772cb666491c9c7b05831a",
+      "max_unit_norm_error": 1.7881393432617188e-07,
+      "embedding_device": "Quadro RTX 8000"
+    },
+    "Reptilia": {
+      "status": "verified",
+      "rows": 2537,
+      "dimensions": 1024,
+      "dtype": "float32",
+      "sha256": "e661fbe44136d6864dbce5cb232f92590f58cdb028386db403e8b3b0175c0b85",
+      "max_unit_norm_error": 1.1920928955078125e-07,
+      "embedding_device": "Quadro RTX 8000"
+    }
+  },
+  "source": "/network/scratch/s/suijkerw/what-to-id/full-2026-09-29/bundle",
+  "failures": [],
+  "elapsed_seconds": 66.14605784416199,
+  "total_rows": 1249747,
+  "sample_rows": 64,
+  "preferred_exact_source_matches": 471,
+  "model_revision": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+  "model_sha256": {
+    "open_clip_config.json": "4c131846348300c77b5bee06690b0e94ee85ca9ce9a30a853b36084d00dcd25c",
+    "open_clip_model.safetensors": "ac2e37c2f89ef8e6b889176a9a3f418970ad9db15a218bd29e3321e95c46ae97"
+  },
+  "encoder_runtime": {
+    "numpy": "2.4.6",
+    "open_clip_torch": "3.1.0",
+    "pillow": "11.3.0",
+    "torch": "2.8.0",
+    "torchvision": "0.23.0"
+  },
+  "reuse_identity": "observation ID, taxon group and photo URL; image bytes not re-fetched",
+  "pool_sha256": "64b2681c5bfa6965c8e56075944969f441c49943fb82e7a3974517da4f126115",
+  "sample_sha256": "1577d1113b54ab953705fe51e29da8baeff19a8f548f33c0d7eb8d905953bf38",
+  "caveats": [
+    "Photo URL identity only; original photo bytes were not re-fetched or hashed.",
+    "Cross-runtime parity not established by this job."
+  ]
+}

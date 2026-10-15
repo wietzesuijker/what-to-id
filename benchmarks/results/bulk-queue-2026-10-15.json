@@ -1,0 +1,64 @@
+{
+  "full_pool_sha256": "e11f893f3a4edf6ab6e73cf12796cb2775f1f42c7314b467698fa9a0835a26b6",
+  "prior_pool_sha256": "64b2681c5bfa6965c8e56075944969f441c49943fb82e7a3974517da4f126115",
+  "pending_pool_sha256": "fce6ea248245d2511dface36a4bec863fbf83274c336fe7fb63f61750be8db56",
+  "pending_manifest_sha256": "61cf3c3d436bfc369c55ef617602a6923c8c68a619787185553cc4eaf69150d5",
+  "full_count": 3068186,
+  "reuse_eligible_count": 1235775,
+  "pending_count": 1832411,
+  "pending_shards": 1790,
+  "reuse_status": "Verified cache hashes, coverage and normalized vectors; 64-row cross-runtime parity passes on two groups, URL identity does not prove unchanged original bytes",
+  "policy": "One supplied primary-photo URL per observation, including unknown life groups",
+  "cache_verification_job": "mila:11265151",
+  "gpu_pilot_job": "fir:65184771",
+  "recorded_at_UTC": "2026-10-15T14:56:43.445076+00:00",
+  "cluster": "fir",
+  "remote_run": "/scratch/wietze/what-to-id/bulk-2026-10-15",
+  "state": "queued, bulk blocked on successful pilot and validation dependencies",
+  "jobs": {
+    "gpu_pilot": 65184771,
+    "cpu_photo_probe": 65185947,
+    "cpu_gpu_validation_gate": 65185969,
+    "photo_staging_array": 65185974,
+    "gpu_encoding_array": 65185979
+  },
+  "array": {
+    "tasks": 112,
+    "task_indices": "0-111",
+    "shards_per_task": 16,
+    "maximum_simultaneous_staging_tasks": 4,
+    "maximum_simultaneous_gpu_tasks": 2,
+    "hours_per_task": 3
+  },
+  "accounts": {
+    "gpu": "rrg-bengioy-ad",
+    "cpu": "def-bengioy",
+    "reason": "Fir RAC allocation accepts GPU jobs; CPU-only requests require the permitted default CPU account"
+  },
+  "dependencies": {
+    "validation_gate": "afterok:65184771",
+    "staging_array": "afterok:65185969:65185947",
+    "encoding_array": "aftercorr:65185974",
+    "failed_prerequisite": "kill-on-invalid-dep=yes"
+  },
+  "pilot_gates": {
+    "identical_source_photo_SHA256": 512,
+    "exact_unique_observation_coverage": 512,
+    "finite_normalized_dimensions": 1024,
+    "minimum_cpu_gpu_cosine": 0.9999,
+    "minimum_batch_photos_per_second": 5
+  },
+  "staging": {
+    "http_workers_per_task": 4,
+    "archive": "one bounded tar per shard on shared scratch, individual photos on node-local storage",
+    "unfetchable": "kept as explicit failure IDs, never silently counted complete",
+    "time_limit_resume": "checkpointed CPU warning may requeue up to three times; arbitrary errors do not requeue"
+  },
+  "limitations": [
+    "Fir pilot and bulk have not completed as of this record.",
+    "Photo availability and full-pool retrieval quality remain unverified.",
+    "This queues embedding computation, it does not publish or deploy the full map index.",
+    "Scratch storage is temporary; original verified reused vectors remain on Mila."
+  ],
+  "stop_queue_command": "ssh fir scancel 65184771 65185947 65185969 65185974 65185979"
+}
