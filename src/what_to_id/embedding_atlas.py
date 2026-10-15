@@ -22,6 +22,52 @@ from what_to_id.arms import load_embeddings
 from what_to_id.page_links import page_url
 
 
+def representation_projection(vectors: np.ndarray) -> tuple:
+    """Return display-only PCA coordinates and clipped RGB, never full embeddings."""
+    centered = vectors.astype(np.float64) - vectors.mean(axis=0, dtype=np.float64)
+    metadata = {
+        "components": 3,
+        "variance_retained": 0.0,
+        "percentiles": [2, 98],
+        "clipped": True,
+        "neutral_channel": 128,
+        "degenerate_axes": "missing or numerically constant axes use neutral channels",
+        "fit_scope": "independently per life group and encoder",
+    }
+    if not np.any(centered):
+        return (
+            np.zeros((len(vectors), 2)),
+            0.0,
+            np.full((len(vectors), 3), 128, dtype=np.uint8),
+            metadata,
+        )
+    # Fix signs so rebuilding the same data does not arbitrarily mirror the plot.
+    if min(centered.shape) > 3:
+        u, singular, vt = svds(centered, k=3, random_state=0)
+    else:
+        u, singular, vt = np.linalg.svd(centered, full_matrices=False)
+        u, singular, vt = u[:, :3], singular[:3], vt[:3]
+    order = np.argsort(singular)[::-1]
+    u, singular, vt = u[:, order], singular[order], vt[order]
+    for axis in range(len(singular)):
+        if vt[axis, np.argmax(np.abs(vt[axis]))] < 0:
+            u[:, axis] *= -1
+    scores = np.zeros((len(vectors), 3), dtype=np.float64)
+    scores[:, : len(singular)] = u * singular
+    total = max(float(np.square(centered).sum()), 1e-30)
+    variance = float(np.square(singular[:2]).sum() / total)
+    variance3 = float(np.square(singular).sum() / total)
+    rgb = np.full((len(vectors), 3), 128, dtype=np.uint8)
+    for axis in range(3):
+        low, high = np.percentile(scores[:, axis], [2, 98])
+        tolerance = max(float(np.max(np.abs(scores[:, axis]))), 1.0) * 1e-10
+        if high - low > tolerance:
+            scaled = np.clip((scores[:, axis] - low) / (high - low), 0, 1)
+            rgb[:, axis] = np.rint(scaled * 255).astype(np.uint8)
+    metadata["variance_retained"] = variance3
+    return scores[:, :2], variance, rgb, metadata
+
+
 def group_payload(
     pool: pd.DataFrame,
     path: Path,
@@ -46,22 +92,7 @@ def group_payload(
     coords = rows[["lon", "lat"]].to_numpy(dtype=float)
     if not np.isfinite(coords).all() or (np.abs(coords) > [180, 90]).any():
         raise ValueError(f"{group}: invalid coordinates")
-    centered = vectors.astype(np.float64) - vectors.mean(axis=0, dtype=np.float64)
-    # Fix signs so rebuilding the same data does not arbitrarily mirror the plot.
-    if min(centered.shape) > 2:
-        u, singular, vt = svds(centered, k=2, random_state=0)
-    else:
-        u, singular, vt = np.linalg.svd(centered, full_matrices=False)
-        u, singular, vt = u[:, :2], singular[:2], vt[:2]
-    order = np.argsort(singular)[::-1]
-    u, singular, vt = u[:, order], singular[order], vt[order]
-    for axis in range(len(singular)):
-        if vt[axis, np.argmax(np.abs(vt[axis]))] < 0:
-            u[:, axis] *= -1
-    xy = u * singular
-    if xy.shape[1] == 1:
-        xy = np.column_stack([xy[:, 0], np.zeros(len(xy))])
-    variance = float(np.square(singular).sum() / max(np.square(centered).sum(), 1e-30))
+    xy, variance, rgb, color_metadata = representation_projection(vectors)
     cosine = np.clip(vectors @ vectors.T, -1, 1)
     np.fill_diagonal(cosine, -np.inf)
     n = min(12, len(ids) - 1)
@@ -123,6 +154,7 @@ def group_payload(
                 "photo": str(row.photo_url) if pd.notna(row.photo_url) else "",
                 "date": str(row.observed_on) if pd.notna(row.observed_on) else "Unknown date",
                 "xy": [round(float(v), 6) for v in xy[i]],
+                "rgb": [int(v) for v in rgb[i]],
                 "neighbors": [[int(j), round(float(cosine[i, j]), 5)] for j in neighbors[i]],
             }
         )
@@ -147,6 +179,7 @@ def group_payload(
         "dimensions": int(vectors.shape[1]),
         "cache_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
         "projection": "PCA",
+        "representation_colors": color_metadata,
         "variance_retained": variance,
         "records": records,
     }

@@ -91,12 +91,25 @@ const AtlasScope = (() => {
       sharedIds: first.filter(id => other.has(id)), cohortCount: leftIds.size,
       exhaustive: leftIds.size <= 13};
   }
+  function hasRepresentationColors(payload) {
+    return Boolean(payload.representation_colors) &&
+      Number.isFinite(payload.representation_colors.variance_retained) &&
+      payload.representation_colors.variance_retained >= 0 &&
+      payload.representation_colors.variance_retained <= 1 + 1e-12 &&
+      payload.records.every(r => Array.isArray(r.rgb) && r.rgb.length === 3 &&
+        r.rgb.every(channel => Number.isInteger(channel) && channel >= 0 && channel <= 255));
+  }
+  function representationColor(rgb) {
+    return Array.isArray(rgb) && rgb.length === 3 &&
+      rgb.every(channel => Number.isInteger(channel) && channel >= 0 && channel <= 255)
+      ? `rgb(${rgb.join(',')})` : '#808080';
+  }
   function requestGate() {
     let generation = 0;
     return {begin: () => ++generation, cancel: () => {generation++;},
       current: token => token === generation};
   }
   return {inBounds, matches, brushIndices, toggleIndex, modelHref, resolveSelection, mapHref,
-    compareNeighborhoods, requestGate};
+    compareNeighborhoods, requestGate, representationColor, hasRepresentationColors};
 })();
 if (typeof module !== 'undefined') module.exports = AtlasScope;

@@ -263,3 +263,17 @@ def test_cross_encoder_small_pool_overlap_is_marked_trivial():
       {group:'Aves',backbone:'b',records:[{id:1,neighbors:[]}]},1)""") == {
         "status": "insufficient_pool",
     }
+
+
+def test_representation_rgb_is_same_render_value_and_old_payload_disables_mode():
+    assert evaluate("scope.representationColor([0,128,255])") == "rgb(0,128,255)"
+    assert evaluate("scope.representationColor([0,Infinity,255])") == "#808080"
+    assert evaluate("scope.representationColor([0,256,255])") == "#808080"
+    assert evaluate("scope.hasRepresentationColors({records:[{id:1}]})") is False
+    assert (
+        evaluate(
+            "scope.hasRepresentationColors({representation_colors:{variance_retained:.2},records:[{rgb:[0,128,255]}]})"
+        )
+        is True
+    )
+    assert evaluate('scope.matches([{id:1,name:"Bird"}],{term:"Bird"}).length') == 1

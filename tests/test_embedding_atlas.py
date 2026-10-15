@@ -259,3 +259,45 @@ def test_current_model_label_must_match_configured_navigation(tmp_path):
             model_view_specs=["A=embeddings.html"],
             current_label="B",
         )
+
+
+def test_three_component_rgb_is_deterministic_clipped_and_display_only(tmp_path):
+    from what_to_id.embedding_atlas import representation_projection
+
+    rng = np.random.default_rng(42)
+    vectors = rng.normal(size=(80, 5))
+    vectors /= np.linalg.norm(vectors, axis=1, keepdims=True)
+    xy, variance2, rgb, metadata = representation_projection(vectors)
+    other = representation_projection(vectors)
+    np.testing.assert_allclose(xy, other[0], atol=1e-10)
+    np.testing.assert_array_equal(rgb, other[2])
+    assert xy.shape == (80, 2)
+    assert rgb.shape == (80, 3) and rgb.dtype == np.uint8
+    assert np.isfinite(rgb).all() and rgb.min() == 0 and rgb.max() == 255
+    assert 0 <= variance2 <= metadata["variance_retained"] <= 1 + 1e-12
+    assert metadata["percentiles"] == [2, 98] and metadata["clipped"] is True
+    pool, cache, _ = inputs(tmp_path)
+    payload = group_payload(pool, cache, "Aves")
+    assert all(len(row["xy"]) == 2 and len(row["rgb"]) == 3 for row in payload["records"])
+    assert all("E" not in row for row in payload["records"])
+
+
+@pytest.mark.parametrize(
+    "vectors,neutral_axes",
+    [
+        (np.array([[1.0, 0.0], [0.0, 1.0], [-1.0, 0.0]]), [2]),
+        (np.array([[1.0], [-1.0], [1.0]]), [1, 2]),
+        (np.ones((3, 4)), [0, 1, 2]),
+        (np.ones((5, 5)), [0, 1, 2]),
+        (np.array([[1.0, 0.0, 0.0, 0.0], [-1.0, 0.0, 0.0, 0.0]] * 3), [1, 2]),
+        (np.array([[1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [1.0, 0.0, 0.0]]), [1, 2]),
+    ],
+)
+def test_small_and_rank_deficient_representation_has_finite_neutral_channels(vectors, neutral_axes):
+    from what_to_id.embedding_atlas import representation_projection
+
+    xy, variance2, rgb, metadata = representation_projection(vectors)
+    assert xy.shape == (len(vectors), 2)
+    assert np.isfinite(xy).all() and np.isfinite(rgb).all()
+    assert np.isfinite(variance2) and np.isfinite(metadata["variance_retained"])
+    assert (rgb[:, neutral_axes] == 128).all()
