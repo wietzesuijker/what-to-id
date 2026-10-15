@@ -277,3 +277,41 @@ def test_representation_rgb_is_same_render_value_and_old_payload_disables_mode()
         is True
     )
     assert evaluate('scope.matches([{id:1,name:"Bird"}],{term:"Bird"}).length') == 1
+
+
+def test_bounded_marker_hit_prefers_nearest_center_not_render_order():
+    assert (
+        evaluate("""scope.nearestMarker([
+      {index:1,id:101,x:10,y:10},{index:2,id:102,x:4,y:3}],{x:0,y:0})""")
+        == 2
+    )
+    assert (
+        evaluate("""scope.nearestMarker([
+      {index:1,id:101,x:13,y:0}],{x:0,y:0})""")
+        is None
+    )
+    assert evaluate("scope.nearestMarker([],{x:0,y:0})") is None
+
+
+def test_marker_hit_radius_boundary_and_stable_id_ties():
+    assert (
+        evaluate("""scope.nearestMarker([
+      {index:1,id:101,x:12,y:0}],{x:0,y:0})""")
+        == 1
+    )
+    assert (
+        evaluate("""scope.nearestMarker([
+      {index:1,id:102,x:3,y:4},{index:2,id:101,x:-3,y:-4}],{x:0,y:0})""")
+        == 2
+    )
+    assert (
+        evaluate("""scope.nearestMarker([
+      {index:2,id:101,x:-3,y:-4},{index:1,id:102,x:3,y:4}],{x:0,y:0})""")
+        == 2
+    )
+
+
+def test_marker_projection_handles_wrapped_world_copy():
+    assert evaluate("scope.nearestLongitude(-123,237)") == 237
+    assert evaluate("scope.nearestLongitude(179,-181)") == -181
+    assert evaluate("scope.nearestLongitude(-123,-124)") == -123

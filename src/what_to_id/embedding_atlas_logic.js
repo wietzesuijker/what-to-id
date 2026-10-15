@@ -104,12 +104,30 @@ const AtlasScope = (() => {
       rgb.every(channel => Number.isInteger(channel) && channel >= 0 && channel <= 255)
       ? `rgb(${rgb.join(',')})` : '#808080';
   }
+  function nearestMarker(candidates, point, radius = 12) {
+    let best = null, bestDistance = radius * radius;
+    for (const candidate of candidates) {
+      if (![candidate.x, candidate.y].every(Number.isFinite)) continue;
+      const distance = (candidate.x - point.x) ** 2 + (candidate.y - point.y) ** 2;
+      if (distance > radius * radius) continue;
+      if (best === null || distance < bestDistance ||
+          (distance === bestDistance && (candidate.id < best.id ||
+           (candidate.id === best.id && candidate.index < best.index)))) {
+        best = candidate;
+        bestDistance = distance;
+      }
+    }
+    return best === null ? null : best.index;
+  }
+  function nearestLongitude(longitude, reference) {
+    return longitude + 360 * Math.round((reference - longitude) / 360);
+  }
   function requestGate() {
     let generation = 0;
     return {begin: () => ++generation, cancel: () => {generation++;},
       current: token => token === generation};
   }
   return {inBounds, matches, brushIndices, toggleIndex, modelHref, resolveSelection, mapHref,
-    compareNeighborhoods, requestGate, representationColor, hasRepresentationColors};
+    compareNeighborhoods, requestGate, representationColor, hasRepresentationColors, nearestMarker, nearestLongitude};
 })();
 if (typeof module !== 'undefined') module.exports = AtlasScope;
