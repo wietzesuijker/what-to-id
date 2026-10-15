@@ -1,0 +1,64 @@
+name: embedding ARM CPU smoke benchmark
+
+on:
+  push:
+    branches: [feat/embedding-atlas]
+    paths:
+      - .github/workflows/embedding-arm-smoke.yml
+      - benchmarks/cpu-arm-requirements.txt
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: embedding-arm-smoke
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    if: github.repository == 'wietzesuijker/what-to-id' && github.event.repository.private == false
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src
+      OMP_NUM_THREADS: '4'
+      OPENBLAS_NUM_THREADS: '4'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Record runner and install ARM CPU dependencies
+        run: |
+          mkdir -p benchmark-results
+          uname -m > benchmark-results/architecture.txt
+          test "$(uname -m)" = aarch64
+          lscpu > benchmark-results/cpu.txt
+          free -b > benchmark-results/memory.txt
+          start=$(date +%s)
+          python -m pip install uv==0.12.23
+          uv pip install --system --torch-backend cpu --only-binary :all: \
+            -r benchmarks/cpu-arm-requirements.txt
+          echo "$(( $(date +%s) - start ))" > benchmark-results/dependency-install-seconds.txt
+          uv pip freeze --system > benchmark-results/environment.txt
+      - name: Encode 32 photos on ARM CPU
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          /usr/bin/time -v -o benchmark-results/process-resources.txt \
+            python -u -m what_to_id.benchmark_embeddings \
+              --pool benchmarks/cpu_sample.csv --out benchmark-results/result.json \
+              --limit 32 --batch 1 --threads 4
+      - name: Preserve measurements even after failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: bioclip25-arm-cpu-smoke-${{ github.run_id }}
+          path: |
+            benchmark-results/*.json
+            benchmark-results/*.txt
+            benchmark-results/result-assets/benchmark-vectors.npz
+          retention-days: 14
+          if-no-files-found: warn
