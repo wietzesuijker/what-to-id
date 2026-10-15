@@ -475,3 +475,61 @@ def test_save_embeddings_keeps_previous_cache_when_compression_fails(tmp_path, m
     assert target.with_suffix(".json").read_bytes() == previous_metadata
     np.testing.assert_array_equal(embed.load_embeddings(target)[0], [1])
     assert set(tmp_path.iterdir()) == {target, target.with_suffix(".json")}
+
+
+@pytest.mark.parametrize("batch", [0, -1])
+def test_embed_group_rejects_batch_before_staging(tmp_path, monkeypatch, batch):
+    def unexpected(*args, **kwargs):
+        pytest.fail("invalid batch must fail before staging or loading")
+
+    monkeypatch.setattr(embed, "stage_images", unexpected)
+    with pytest.raises(ValueError, match="batch size must be positive"):
+        embed.embed_group(_pool([1]), cache_dir=tmp_path, batch=batch, _loader=unexpected)
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize(
+    "output",
+    [
+        np.ones(8),
+        np.ones((2, 8)),
+        np.ones((1, 0)),
+        np.full((1, 8), np.nan),
+        np.full((1, 8), np.inf),
+        np.zeros((1, 8)),
+    ],
+)
+def test_invalid_encoder_output_fails_first_batch_without_cache(tmp_path, monkeypatch, output):
+    _stage_bytes(monkeypatch, tmp_path, [1, 2])
+    calls = []
+
+    def loader(backbone, device):
+        def model(items):
+            calls.append(len(items))
+            return output
+
+        return model, lambda path: np.ones(8)
+
+    with pytest.raises(ValueError, match="encoder output"):
+        embed.embed_group(_pool([1, 2]), cache_dir=tmp_path, batch=1, _loader=loader)
+    assert calls == [1]
+    assert not list(tmp_path.glob("emb_*.npz"))
+    assert not list(tmp_path.glob("emb_*.json"))
+
+
+def test_embed_paths_rejects_changed_width_before_third_batch():
+    calls = []
+
+    def batch_fn(items):
+        calls.append(len(items))
+        return np.ones((1, 8 if len(calls) == 1 else 7))
+
+    with pytest.raises(ValueError, match="width changed"):
+        embed._embed_paths(
+            ["a", "b", "c"],
+            batch_fn,
+            lambda path: path,
+            batch=1,
+            open_image=lambda path: path,
+        )
+    assert calls == [1, 1]

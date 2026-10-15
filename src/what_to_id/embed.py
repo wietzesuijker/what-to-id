@@ -340,6 +340,8 @@ def _embed_paths(
     ``batch_fn`` takes a list of preprocessed items and returns a (k, d) numpy array.
     Images that fail to open or preprocess are dropped and reported as (index, error).
     """
+    if batch <= 0:
+        raise ValueError("embedding batch size must be positive")
     embs: list[np.ndarray] = []
     kept: list[int] = []
     failed: list[tuple[int, str]] = []
@@ -348,7 +350,18 @@ def _embed_paths(
 
     def flush() -> None:
         if buf:
-            embs.append(np.asarray(batch_fn(buf), dtype=np.float32))
+            output = np.asarray(batch_fn(buf), dtype=np.float32)
+            if output.ndim != 2 or output.shape[0] != len(buf) or output.shape[1] == 0:
+                raise ValueError(
+                    "encoder output must be a 2D matrix with one nonempty row per input"
+                )
+            if embs and output.shape[1] != embs[0].shape[1]:
+                raise ValueError("encoder output width changed between batches")
+            if not np.isfinite(output).all():
+                raise ValueError("encoder output must contain only finite values")
+            if not np.all(np.linalg.norm(output.astype(np.float64), axis=1) > 0):
+                raise ValueError("encoder output rows must have nonzero norm")
+            embs.append(output)
             kept.extend(idxs)
             buf.clear()
             idxs.clear()
@@ -436,6 +449,8 @@ def embed_group(
     Skips work when the npz already covers every id in the group and appends only the
     missing ids otherwise. ``_loader`` swaps in a numpy (model_fn, preprocess) pair for tests.
     """
+    if batch <= 0:
+        raise ValueError("embedding batch size must be positive")
     if backbone not in BACKBONES:
         raise KeyError(f"unknown backbone {backbone!r}; choose from {sorted(BACKBONES)}")
     cache_dir = Path(cache_dir)
