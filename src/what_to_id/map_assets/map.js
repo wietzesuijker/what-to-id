@@ -501,7 +501,7 @@ function place(){
 function closeCard(){SEL=-1;card.hidden=true;if(ctl)ctl.abort();
   if(GONE_NEW){GONE_NEW=false;refilter();}else{layers();writeHash();}}
 function openCard(i){
-  SEL=i;var t=names(i),id=P.id[i],lag=P.obs[i]!==NO&&P.up[i]!==NO&&!(P.fl[i]&(FLAG.earlyObs|FLAG.earlyUp))?P.up[i]-P.obs[i]:null;
+  S.rec=null;$('record-note').hidden=true;SEL=i;var t=names(i),id=P.id[i],lag=P.obs[i]!==NO&&P.up[i]!==NO&&!(P.fl[i]&(FLAG.earlyObs|FLAG.earlyUp))?P.up[i]-P.obs[i]:null;
   card.innerHTML='<button type="button" class="x" aria-label="Close">×</button>'+
     '<div class="ph" id="ph">Loading photo</div><div class="body">'+
     '<h2>'+esc(t.common||t.latin)+'</h2><p class="latin"><i>'+esc(t.latin)+'</i>'+
@@ -512,6 +512,7 @@ function openCard(i){
     '<div id="now"></div><a class="btn" target="_blank" rel="noopener" '+
     'href="https://www.inaturalist.org/observations/'+id+'">Help identify on iNaturalist</a>'+
     '<p class="attr" id="attr"></p></div>';
+  if(META.atlas_url){var sample=document.createElement('a');sample.className='btn';sample.textContent='Explore image sample';sample.href=MapLinks.atlasHref(META.atlas_url,location.href,META.groups[P.grp[i]],id);sample.target='_blank';sample.rel='noopener noreferrer';var note=document.createElement('p');note.className='attr';note.textContent='Opens a separate frozen image sample, without changing this map or its record list.';card.querySelector('.body').appendChild(sample);card.querySelector('.body').appendChild(note);}
   card.hidden=false;card.querySelector('.x').onclick=closeCard;card.querySelector('.x').focus();
   place();
   layers();writeHash();
@@ -581,9 +582,11 @@ META.shards.forEach(function(s,k){
     if(k===0)return names0;
   }).then(function(){
     refilter();
-    if(S.rec&&SEL<0){for(var i=0;i<P.n;i++)if(P.id[i]===S.rec){S.rec=null;openCard(i);
-      if(S.fly){S.fly=false;map.flyTo({center:[P.pos[2*i],P.pos[2*i+1]],zoom:12});}break;}}
-    if(k===META.shards.length-1&&S.rec){S.rec=null;writeHash();}
+    if(S.rec&&SEL<0){var requested=S.rec,resolution=MapLinks.resolveRecord(P.id,requested,k===META.shards.length-1);
+      if(resolution.index>=0){var i=resolution.index;openCard(i);
+        if(S.fly){S.fly=false;map.flyTo({center:[P.pos[2*i],P.pos[2*i+1]],zoom:12});}}
+      else if(resolution.missing){var notice=$('record-note');notice.hidden=false;notice.textContent='Requested observation '+requested+' is not in this map snapshot. No replacement has been selected. ';var original=document.createElement('a');original.href='https://www.inaturalist.org/observations/'+requested;original.textContent='View the requested observation on iNaturalist';original.target='_blank';original.rel='noopener noreferrer';notice.appendChild(original);writeHash();}}
+
   });
 });
 chain.catch(function(e){$('count').textContent='Could not load the records ('+e.message+')';});

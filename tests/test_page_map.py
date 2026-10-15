@@ -645,3 +645,18 @@ def test_area_box_link_cuts_to_view_counts_and_pages_like_the_batches():
         "per_page": ["200"],
         "reviewed": ["false"],
     }
+
+
+def test_atlas_link_opt_in_preserves_blind_default_and_rejects_unsafe_urls(tmp_path):
+    _, meta = encode_points(make_pool(10))
+    default = render_map(meta, freeze=None)
+    default_meta = json.loads(re.search(r"var META=(\{.*?\});var BASEMAPS", default).group(1))
+    assert "atlas_url" not in default_meta
+    enabled = render_map(meta, freeze=None, atlas_url="embeddings.html")
+    enabled_meta = json.loads(re.search(r"var META=(\{.*?\});var BASEMAPS", enabled).group(1))
+    assert enabled_meta["atlas_url"] == "embeddings.html"
+    assert not [w for w in ARM_WORDS if w in enabled.lower()]
+    write_map(tmp_path, make_pool(10), atlas_url="embeddings.html")
+    assert '"atlas_url":"embeddings.html"' in (tmp_path / "map.html").read_text()
+    with pytest.raises(ValueError, match="HTTPS"):
+        render_map(meta, freeze=None, atlas_url="javascript:alert(1)")

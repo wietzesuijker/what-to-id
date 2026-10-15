@@ -45,6 +45,13 @@ const AtlasScope = (() => {
     target.hash = state.toString();
     return target.href;
   }
+  function mapHref(target, base, group, id) {
+    const url = new URL(target, base);
+    const state = new URLSearchParams({groups: group});
+    if (id !== null && id !== undefined) state.set('record', String(id));
+    url.hash = state.toString();
+    return url.href;
+  }
   function resolveSelection(records, requested) {
     const id = Number(requested);
     const valid = requested !== null && requested !== '' && Number.isSafeInteger(id) && id > 0;
@@ -52,6 +59,6 @@ const AtlasScope = (() => {
     const index = records.findIndex(record => record.id === id);
     return {index: index < 0 ? 0 : index, missingRequestedId: index < 0 ? id : null};
   }
-  return {inBounds, matches, brushIndices, toggleIndex, modelHref, resolveSelection};
+  return {inBounds, matches, brushIndices, toggleIndex, modelHref, resolveSelection, mapHref};
 })();
 if (typeof module !== 'undefined') module.exports = AtlasScope;

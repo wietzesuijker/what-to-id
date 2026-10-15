@@ -168,3 +168,13 @@ def test_unknown_cross_model_observation_is_explicitly_reported_not_lost():
         "index": 0,
         "missingRequestedId": None,
     }
+
+
+def test_atlas_returns_same_record_and_exact_group_to_sibling_map():
+    assert (
+        evaluate(
+            'scope.mapHref("../map.html", '
+            '"https://example.org/dinov3/embeddings.html", "Aves", 123)'
+        )
+        == "https://example.org/map.html#groups=Aves&record=123"
+    )

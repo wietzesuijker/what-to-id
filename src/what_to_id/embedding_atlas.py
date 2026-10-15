@@ -19,6 +19,7 @@ import pandas as pd
 from scipy.sparse.linalg import svds
 
 from what_to_id.arms import load_embeddings
+from what_to_id.page_links import page_url
 
 
 def group_payload(
@@ -186,9 +187,11 @@ def build(
     region_name: str | None = None,
     model_view_specs: list[str] | None = None,
     current_label: str | None = None,
+    map_view: str = "https://pollocklab.github.io/what-to-id/map.html",
 ) -> None:
     snapshot_date = date.fromisoformat(snapshot_date).isoformat()
     views = model_views(model_view_specs or [])
+    map_view = page_url(map_view)
     if current_label is not None and views and current_label not in {v["label"] for v in views}:
         raise ValueError("current model label must match a configured model view")
     pool = pd.read_parquet(pool_path)
@@ -244,6 +247,7 @@ def build(
             if reference_pool_path is not None
             else None
         ),
+        "map_view": map_view,
         "region_name": region_name,
         "model_views": views,
         "current_label": current_label,
@@ -285,6 +289,11 @@ def main() -> None:
         help="Optional model navigation page, repeat for each separate model",
     )
     parser.add_argument("--current-label", help="Label of this model view")
+    parser.add_argument(
+        "--map-view",
+        default="https://pollocklab.github.io/what-to-id/map.html",
+        help="Map return target, relative path or HTTPS URL",
+    )
     args = parser.parse_args()
     build(
         args.pool,
@@ -296,6 +305,7 @@ def main() -> None:
         region_name=args.region_name,
         model_view_specs=args.model_view,
         current_label=args.current_label,
+        map_view=args.map_view,
     )
 
 
