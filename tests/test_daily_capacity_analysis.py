@@ -167,7 +167,7 @@ def test_cold_download_is_amortized_over_all_512_not_first_64():
 
 
 def test_user_capped_policy_allows_recovery_longer_than_seven_days():
-    result = capacity.simulate_with_daily_cap([6235] * 14, rate=2.7)
+    result = capacity.simulate_with_time_budget([6235] * 14, rate=2.7, target=10000)
     assert result["target_daily_photo_cap"] == 10000
     assert result["effective_daily_capacity"] == 10000
     assert result["feasible_with_measured_budget"] is True
@@ -180,14 +180,14 @@ def test_user_capped_policy_allows_recovery_longer_than_seven_days():
 
 
 def test_five_thousand_cap_cannot_keep_up_with_conservative_trace():
-    result = capacity.simulate_with_daily_cap([6235] * 14, rate=2.7, target=5000)
+    result = capacity.simulate_with_time_budget([6235] * 14, rate=2.7, target=5000)
     assert result["observed_trace_gate"] == "fails"
     assert result["mean_arrivals_minus_daily_capacity"] == 1235
     assert result["summaries"]["7"]["uncleared_phases_within_horizon"] == 14
 
 
 def test_capped_policy_respects_actual_compute_not_just_requested_target():
-    result = capacity.simulate_with_daily_cap([5000] * 14, rate=5)
+    result = capacity.simulate_with_time_budget([5000] * 14, rate=5, target=10000)
     assert result["raw_measured_budget_capacity_per_day"] == 6120
     assert result["effective_daily_capacity"] == 6120
     assert result["feasible_with_measured_budget"] is False
@@ -196,8 +196,21 @@ def test_capped_policy_respects_actual_compute_not_just_requested_target():
 
 def test_analyzer_exposes_user_policy_separately_from_legacy_comparison():
     result = capacity.analyze(**evidence())
-    assert result["user_capped_spillover_policy"]["workers"] == 4
-    assert result["user_capped_spillover_policy"]["worker_hours"] == 3
-    assert result["user_capped_spillover_policy"]["target_daily_photo_cap"] == 10000
+    assert result["time_budget_spillover_policy"]["workers"] == 4
+    assert result["time_budget_spillover_policy"]["worker_hours"] == 3
+    assert result["time_budget_spillover_policy"]["target_daily_photo_cap"] is None
     assert result["policy"]["normal_workers"] == 2
     assert result["evidence_gates"]["annual_or_seasonal_capacity"] == "UNVERIFIED"
+
+
+def test_time_budget_uses_reserved_capacity_without_arbitrary_photo_cap():
+    result = capacity.simulate_with_time_budget([6235] * 14, rate=2.5)
+    assert result["target_daily_photo_cap"] is None
+    assert result["effective_daily_capacity"] == 12240
+    assert result["capacity_without_compute_reserve_per_day"] == 16320
+    assert result["observed_trace_gate"] == "passes"
+    assert result["summaries"]["7"]["uncleared_phases_within_horizon"] == 0
+    assert (
+        max(day["processed"] for scenario in result["scenarios"] for day in scenario["days"])
+        > 10000
+    )

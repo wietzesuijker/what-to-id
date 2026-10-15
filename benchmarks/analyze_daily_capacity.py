@@ -66,20 +66,22 @@ def simulate(trace, normal: int, recovery: int, missed: int, phase: int, horizon
     }
 
 
-def simulate_with_daily_cap(
+def simulate_with_time_budget(
     trace,
     rate: float,
-    target: int = 10000,
+    target: int | None = None,
     *,
     workers: int = 4,
     hours: float = 3,
     horizon: int = 90,
 ):
-    """One capped queue permits spillover, with no next-day or seven-day recovery SLA."""
-    if isinstance(target, bool) or not isinstance(target, int) or target <= 0:
+    """Use the worker time budget, optionally capped, and permit queue spillover."""
+    if target is not None and (
+        isinstance(target, bool) or not isinstance(target, int) or target <= 0
+    ):
         raise ValueError("daily photo cap must be a positive integer")
     raw_capacity = daily_capacity(workers, rate, hours=hours)
-    effective = min(target, raw_capacity)
+    effective = raw_capacity if target is None else min(target, raw_capacity)
     scenarios = [
         simulate(trace, effective, effective, missed, phase, horizon=horizon)
         for missed in (0, 1, 3, 7)
@@ -88,7 +90,7 @@ def simulate_with_daily_cap(
     for scenario in scenarios:
         previous = 0
         for day in scenario["days"]:
-            day["mode"] = "outage" if day["mode"] == "outage" else "capped_processing"
+            day["mode"] = "outage" if day["mode"] == "outage" else "budgeted_processing"
             day["processed"] = previous + day["arrivals"] - day["backlog"]
             previous = day["backlog"]
     summaries = {}
@@ -114,7 +116,14 @@ def simulate_with_daily_cap(
         "reserved_compute_fraction": 0.25,
         "raw_measured_budget_capacity_per_day": raw_capacity,
         "effective_daily_capacity": effective,
-        "feasible_with_measured_budget": raw_capacity >= target,
+        "feasible_with_measured_budget": target is None or raw_capacity >= target,
+        "capacity_without_compute_reserve_per_day": daily_capacity(
+            workers, rate, hours=hours, reserved=0
+        ),
+        "overhead_warning": (
+            "600 seconds is an assumed budget for model, metadata, transfer "
+            "and index work, not a measured production envelope"
+        ),
         "user_allows_spillover": True,
         "new_observation_next_day_SLA": False,
         "observed_trace_gate": "passes" if mean < effective and clears else "fails",
@@ -284,10 +293,10 @@ def analyze(
                 "linear_extrapolation_mean_daily_seconds": timings[key] * mean / count,
                 "linear_extrapolation_peak_daily_seconds": timings[key] * max(trace) / count,
             }
-    capped_policy = simulate_with_daily_cap(trace, rate)
-    lower_cap_stress = simulate_with_daily_cap(trace, rate, target=5000)
+    budget_policy = simulate_with_time_budget(trace, rate)
+    lower_cap_stress = simulate_with_time_budget(trace, rate, target=5000)
     return {
-        "user_capped_spillover_policy": capped_policy,
+        "time_budget_spillover_policy": budget_policy,
         "five_thousand_daily_cap_stress": lower_cap_stress,
         "scope": (
             "CPU encoding capacity under observed BC needs-ID changed-record delivery upper bounds"
@@ -296,7 +305,7 @@ def analyze(
             "checkpoint_resume_and_cached_reuse": "verified by supplied benchmark reports",
             "observed_trace_encoding_capacity": "passes" if gate else "fails",
             "observed_trace_encoding_capacity_scope": "Legacy two-worker/recovery comparison",
-            "user_capped_spillover_observed_trace": capped_policy["observed_trace_gate"],
+            "time_budget_spillover_observed_trace": budget_policy["observed_trace_gate"],
             "annual_or_seasonal_capacity": "UNVERIFIED",
             "release_transfer_and_deployment_io": "UNVERIFIED, not measured in these inputs",
             "global_existing_observation_neighbor_refresh": "UNVERIFIED",
@@ -317,7 +326,7 @@ def analyze(
             ),
         },
         "policy": {
-            "role": "Legacy comparison, separate from user capped spillover policy",
+            "role": "Legacy comparison, separate from time budget spillover policy",
             "normal_workers": 2,
             "recovery_workers": 4,
             "normal_worker_hours": normal_worker_hours,
