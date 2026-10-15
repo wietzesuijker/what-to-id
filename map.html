@@ -1,0 +1,1819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Records that need an ID in BC</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/deck.gl@9.1.14/dist.min.js"></script>
+<style>:root{--bg:#fbfbf9;--panel:#fff;--ink:#1d1d1b;--muted:#5f5e58;--line:#dcdbd3;--dot:42,120,214;
+  --bar:#2a78d6;--total:#d5e3f5;--share:#c2410c;--chip:#f0efe9;--on:#1d1d1b;--onink:#fff;--warn:#8a4b00;--warnbg:#fdf0dc;
+  --shadow:0 4px 16px rgba(0,0,0,.18)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1a19;--panel:#222220;
+  --ink:#fff;--muted:#c3c2b7;--line:#3a3a37;--dot:57,135,229;--bar:#3987e5;--total:#2b3a4d;--share:#fb923c;--chip:#2c2c2a;--on:#fff;
+  --onink:#1a1a19;--warn:#ffc27a;--warnbg:#3a2a14;--shadow:0 4px 16px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:#1a1a19;--panel:#222220;--ink:#fff;--muted:#c3c2b7;--line:#3a3a37;
+  --dot:57,135,229;--bar:#3987e5;--total:#2b3a4d;--share:#fb923c;--chip:#2c2c2a;--on:#fff;--onink:#1a1a19;--warn:#ffc27a;
+  --warnbg:#3a2a14;--shadow:0 4px 16px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+body{display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
+  grid-template-areas:"head head" "side map" "side time"}
+header{grid-area:head;padding:10px 16px;border-bottom:1px solid var(--line);display:flex;
+  flex-wrap:wrap;align-items:center;gap:4px 16px}
+.head{flex:1 1 360px;min-width:0}
+h1{font-size:18px;margin:0}
+.sub,.hint,.muted{color:var(--muted);margin:0;font-size:12px}
+.sub a{color:inherit}
+.stat{margin:0;font-size:13px}
+#more{color:var(--muted)}
+.share{display:block;color:var(--muted);font-size:12px}
+.idlink{padding:4px 12px;border-radius:14px;background:var(--on);color:var(--onink);font-size:13px;
+  font-weight:600;text-decoration:none}
+.idstep{display:inline-flex;align-items:center;gap:4px}
+.idarrow{border:1px solid var(--line);background:var(--chip);color:var(--ink);font:inherit;font-size:15px;
+  line-height:1;min-width:28px;min-height:28px;padding:0 6px;border-radius:14px;cursor:pointer}
+.idarrow[hidden]{display:none}
+.idarrow:disabled{opacity:.5;cursor:default}
+.side{grid-area:side;overflow:auto;padding:12px 16px;border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:6px}
+.lbl{display:block;font-size:12px;font-weight:600;margin:6px 0 2px}
+.lbl .muted{font-weight:400}
+.picker{position:relative}
+.picker input{width:100%;font:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--line);
+  border-radius:6px;background:var(--panel);color:var(--ink)}
+/* one "not" style for every left-out chip: shortcuts, projects, groups, show only, the bar */
+.chips button.not,.chips button[aria-pressed="true"].not,
+  .schip.not{background:var(--warnbg);color:var(--warn)}
+.chips button.not,.chips button[aria-pressed="true"].not,.schip.not{border:1px dashed var(--warn)}
+.selbar{border:1px solid var(--line);border-radius:8px;padding:4px 8px 8px;background:var(--chip);
+  position:sticky;top:-12px;z-index:3;max-height:40vh;overflow:auto;flex-shrink:0}
+/* folding filter sections; the summary counts what is active inside */
+.sec{border-top:1px solid var(--line);padding:2px 0 4px}
+.sec>summary{cursor:pointer;font-size:12px;font-weight:600;padding:6px 0 4px;list-style-position:inside}
+.sec>summary .n:not(:empty){display:inline-block;margin-left:4px;min-width:18px;padding:0 5px;border-radius:9px;
+  background:var(--on);color:var(--onink);font-size:11px;line-height:16px;text-align:center}
+.sec>*+*{margin-top:4px}
+.sec[hidden]{display:none}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.chips .schip button.sl,.chips .schip button.sl[aria-pressed="true"]{border:0;background:none;color:inherit;
+  padding:3px 2px 3px 0;min-width:0;text-align:left;overflow-wrap:anywhere}
+.selbar .lbl{margin-top:2px}
+.selbar ul{margin:0;padding:0;list-style:none}
+.schip{display:inline-flex;align-items:center;max-width:100%;border:1px solid var(--on);border-radius:13px;
+  background:var(--on);color:var(--onink);font-size:12px;padding-left:9px}
+.schip span{overflow-wrap:anywhere}
+.chips .schip button{border:0;background:none;color:inherit;padding:3px 8px;min-height:26px;min-width:28px}
+.chips .schip button.sn{padding:3px 4px;min-width:0;opacity:.8;font-size:11px}
+.sugg{position:absolute;left:0;right:0;top:100%;z-index:8;margin:2px 0 0;padding:4px 0;list-style:none;
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);
+  max-height:50vh;overflow:auto}
+.sugg[hidden]{display:none}
+.sugg li{padding:6px 10px;cursor:pointer;min-height:36px}
+.sugg li span{display:block;color:var(--muted);font-size:12px}
+.sugg li[aria-selected="true"]{background:var(--chip)}
+.idnote{flex:1 1 100%;margin:0;font-size:12px;color:var(--warn);background:var(--warnbg);
+  border-radius:6px;padding:4px 8px}
+.idnote[hidden]{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chips button,.seg button{border:1px solid var(--line);background:var(--chip);color:var(--ink);
+  font:inherit;font-size:12px;padding:3px 9px;min-height:26px;cursor:pointer;border-radius:13px}
+.chips button[aria-pressed="true"],.seg button[aria-pressed="true"]{background:var(--on);
+  color:var(--onink);border-color:var(--on)}
+.months button{min-width:40px;padding:3px 0}
+.seg{display:inline-flex}
+.seg button{border-radius:0}
+.seg button:first-child{border-radius:13px 0 0 13px}
+.seg button:last-child{border-radius:0 13px 13px 0;border-left:0}
+.link{border:0;background:none;color:var(--muted);font:inherit;font-size:12px;font-weight:400;
+  text-decoration:underline;cursor:pointer;padding:0 2px}
+#reset{align-self:flex-start;margin-top:8px}
+.prow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.padd{font:inherit;font-size:12px;min-height:26px;max-width:100%;padding:2px 6px;border:1px solid var(--line);
+  border-radius:6px;background:var(--panel);color:var(--ink)}
+.prow label{flex:1 1 100%}
+.prow input.padd{flex:1 1 140px;min-width:0;font-size:16px}
+button.padd{cursor:pointer;background:var(--chip)}
+/* "Identify only": a pasted project, in the Identify link but not the map filter */
+.tag{display:inline-block;margin-left:5px;padding:0 5px;border:1px solid currentColor;border-radius:8px;
+  font-size:10px;line-height:14px;white-space:nowrap}
+#map{grid-area:map;position:relative;min-height:240px}
+.time{grid-area:time;padding:8px 16px 10px;border-top:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.dates{font-size:12px;color:var(--muted);white-space:nowrap}
+.dates input{font:inherit;font-size:12px;padding:2px 4px;border:1px solid var(--line);border-radius:6px;
+  background:var(--panel);color:var(--ink)}
+.histwrap{position:relative;margin:6px 0 2px}
+#hist{width:100%;height:64px;display:block;cursor:crosshair;touch-action:none}
+#over{width:100%;height:34px;display:block;cursor:pointer;touch-action:none}
+.unit{margin:4px 0 0;font-size:11px;color:var(--muted)}
+.htip{position:absolute;top:-4px;transform:translate(-50%,-100%);background:var(--panel);
+  color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:12px;
+  white-space:nowrap;pointer-events:none;box-shadow:var(--shadow)}
+.ptip{position:fixed;z-index:7;max-width:260px;background:var(--panel);color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);font-size:12px;padding:6px 8px;
+  pointer-events:none}
+.ptip[hidden]{display:none}
+.card{position:fixed;right:16px;top:84px;width:320px;max-height:calc(100vh - 100px);overflow:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);
+  z-index:5;padding:0 0 12px}
+.card .ph{background:var(--chip);aspect-ratio:4/3;display:flex;align-items:center;
+  justify-content:center;border-radius:10px 10px 0 0;overflow:hidden;color:var(--muted);font-size:12px}
+.card .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card .body{padding:8px 14px 0}
+.card h2{font-size:16px;margin:0}
+.card .latin{margin:0 0 6px;color:var(--muted)}
+.card dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:6px 0;font-size:13px}
+.card dt{color:var(--muted)}
+.card dd{margin:0}
+.card .x{position:absolute;right:8px;top:8px;width:30px;height:30px;border-radius:15px;border:0;
+  background:var(--panel);color:var(--ink);font-size:18px;line-height:1;cursor:pointer;
+  box-shadow:var(--shadow)}
+.card .btn{display:block;text-align:center;margin:10px 0 0;padding:8px;border-radius:8px;
+  background:var(--on);color:var(--onink);text-decoration:none;font-weight:600}
+.card .attr{font-size:11px;color:var(--muted);margin:8px 0 0}
+.badges{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
+.badge{font-size:11px;padding:1px 7px;border-radius:9px;border:1px solid var(--line);color:var(--ink)}
+.badge.warn{background:var(--warnbg);color:var(--warn);border-color:transparent}
+.now{font-size:13px;margin:6px 0 0;padding:6px 8px;border-radius:6px;background:var(--chip)}
+.toggle{display:none}
+@media (max-width:760px){
+  body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;
+    grid-template-areas:"head" "map" "time"}
+  .head{flex-basis:100%}
+  .toggle{display:inline-block;margin-left:auto;border:1px solid var(--line);background:var(--chip);
+    color:var(--ink);font:inherit;font-size:13px;padding:4px 12px;border-radius:14px}
+  .side{position:fixed;left:0;right:0;bottom:0;max-height:70vh;z-index:6;background:var(--panel);
+    border:0;border-top:1px solid var(--line);box-shadow:var(--shadow);display:none}
+  .side.open{display:flex}
+  .card{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:60vh}
+  .card .ph{aspect-ratio:16/9}
+  .hint{display:none}
+}
+
+.area{max-width:min(240px,calc(100vw - 80px));background:var(--panel);color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:6px}
+.abtns{display:flex;flex-wrap:wrap;gap:4px}
+.abtns button,.afile{border:1px solid var(--line);background:var(--chip);color:var(--ink);font:inherit;
+  font-size:12px;padding:3px 9px;min-height:28px;cursor:pointer;border-radius:13px;display:inline-flex;
+  align-items:center}
+.abtns button[hidden],.afile[hidden]{display:none}
+.abtns button:disabled{opacity:.5;cursor:default}
+.afile{position:relative}
+.afile input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.afile:focus-within{outline:2px solid var(--bar)}
+.anote{margin:6px 2px 0;font-size:12px;color:var(--muted)}
+.anote[hidden]{display:none}
+.abox{display:block;margin:4px 2px 0;font-size:12px;color:inherit}
+.abox[hidden]{display:none}
+.apark{margin-top:4px}
+.apark[hidden]{display:none}
+.acombo{position:relative}
+.acombo input{width:100%;box-sizing:border-box;font:inherit;font-size:12px;padding:4px 28px 4px 8px;min-height:28px;
+  border:1px solid var(--line);border-radius:13px;background:var(--panel);color:var(--ink)}
+.atog{position:absolute;right:2px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);
+  font:inherit;font-size:13px;width:24px;height:24px;cursor:pointer;border-radius:12px}
+.atog:hover{background:var(--chip)}
+.apanel{margin-top:4px;font-size:12px}
+.apanel[hidden]{display:none}
+.ahdr{display:flex;align-items:center;gap:2px;color:var(--muted);padding:0 6px 2px}
+.ahdr button{border:0;background:none;color:var(--ink);font:inherit;padding:2px;cursor:pointer;text-decoration:underline}
+.ahdr button[hidden]{display:none}
+.alist{max-height:260px;overflow:auto;overscroll-behavior:contain}
+.alist .ahead{display:block;color:var(--muted);font-weight:600;padding:6px 6px 2px}
+.alist [role=option]{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:pointer}
+.alist [role=option]:hover{background:var(--chip)}
+.alist [role=option].aact{background:var(--chip);outline:2px solid var(--bar);outline-offset:-2px}
+.acheck{flex:none;width:12px;height:12px;border:1.5px solid var(--muted);border-radius:3px;box-sizing:border-box;
+  display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1}
+[aria-selected=true]>.acheck{background:var(--bar);border-color:var(--bar);color:#fff}
+[aria-selected=true]>.acheck::before{content:'\2713'}
+.anm{flex:1;min-width:0;overflow-wrap:anywhere}
+.anm b{font-weight:700}
+.akind,.adrawn{flex:none;color:var(--muted);font-size:10px}
+.adrawn{border:1px dashed var(--muted);border-radius:6px;padding:0 3px}
+.amore{margin:4px 6px 0;color:var(--muted)}
+.amore[hidden]{display:none}
+.alive{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:479px){
+  .apanel{position:fixed;left:8px;right:8px;z-index:10;background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;box-shadow:var(--shadow);padding:4px;max-height:50vh;display:flex;flex-direction:column}
+  .alist{max-height:none;flex:1;min-height:0}
+  .alist [role=option],.ahdr button{min-height:44px}
+  .acombo input{min-height:44px;font-size:16px}
+  .atog{width:40px;height:40px}
+}
+.achips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.achips[hidden]{display:none}
+.achip{display:inline-flex;align-items:center;gap:2px;max-width:100%;font-size:12px;padding:2px 2px 2px 9px;
+  border:1px solid var(--line);border-radius:13px;background:var(--chip);color:var(--ink)}
+.achip.aload{opacity:.6}
+.achip button{border:0;background:none;color:inherit;font:inherit;font-size:14px;line-height:1;cursor:pointer;
+  min-width:24px;min-height:24px;border-radius:12px}
+.achip button:hover,.achip button:focus-visible{background:var(--line)}
+</style>
+</head>
+<body>
+<header>
+<div class="head">
+<h1>Records that need an ID in BC</h1>
+<p class="sub">Each dot is one record that needed an ID and had a photo on <time id="updated" datetime="2026-09-11" title="2026-09-11">2026-09-11</time>. Hover a dot for its name, click it for the photo. <a href="index.html">Back</a></p>
+</div>
+<p class="stat" aria-live="polite"><b id="count">Loading</b> <span id="more"></span><span id="share" class="share"></span></p>
+<span class="idstep"><button type="button" id="idprev" class="idarrow" aria-label="Previous batch" hidden>‹</button><a id="identify" class="idlink" target="_blank" rel="noopener" href="https://www.inaturalist.org/observations/identify?quality_grade=needs_id&amp;place_id=7085">Identify these</a><button type="button" id="idnext" class="idarrow" aria-label="Next batch" hidden>›</button></span>
+<p id="record-note" class="idnote" role="status" hidden></p>
+<p id="idnote" class="idnote" role="status" hidden></p>
+<button type="button" id="toggle" class="toggle" aria-expanded="false" aria-controls="side">Filters</button>
+</header>
+<section id="side" class="side" aria-label="Filters">
+<div id="selbar" class="selbar" role="region" aria-label="Your selection" hidden><p class="lbl">Your selection <button type="button" class="link">Clear all</button></p><ul class="chips"></ul></div>
+<p class="muted">Click a chip to pick it, again to leave it out, a third time to clear it. In Your selection, click a chip to flip it.</p>
+<details class="sec" id="taxsec" open><summary>Taxa <span class="n" id="ntaxa"></span></summary>
+<div class="picker"><label for="q" class="vh">Find a taxon</label>
+<input id="q" type="search" placeholder="Latin or common name, e.g. Carex" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugg">
+<ul id="sugg" class="sugg" role="listbox" aria-label="Matching taxa" hidden></ul></div>
+<p id="qn" class="muted" aria-live="polite"></p>
+<div id="cladebox" hidden><div id="clades" class="chips" role="group" aria-label="Taxon shortcuts"></div></div>
+<p class="muted">Pick several to combine. A taxon keeps everything below it, so Bryophyta keeps all mosses.</p>
+</details>
+<details class="sec" id="flagbox" open><summary>Show only <span class="n" id="nonly"></span></summary>
+<div id="flags" class="chips" role="group" aria-label="Show only"></div></details>
+<details class="sec" id="projbox" hidden></details>
+<details class="sec" id="grpsec"><summary>Groups <span class="n" id="ngroups"></span></summary>
+<div id="groups" class="chips" role="group" aria-label="Taxon groups"></div>
+<p class="muted">Groups combine with each other and with the taxa. <button type="button" id="gall" class="link">All groups</button></p>
+</details>
+<details class="sec" id="monsec"><summary>Months of the year <span class="n" id="nmonths"></span></summary>
+<div id="months" class="chips months" role="group" aria-label="Months of the year"></div>
+<p class="muted">Compare the same season across years. <button type="button" id="mclear" class="link">Any month</button></p>
+</details>
+<button type="button" id="reset" class="link">Reset all filters</button>
+</section>
+<main id="map" role="application" aria-label="Map of records"></main>
+<section id="time" class="time" aria-label="Dates">
+<div class="row">
+<span class="seg" role="group" aria-label="Date to filter on">
+<button type="button" id="byObs" aria-pressed="true" title="The date the photo was taken">Observed</button><button type="button" id="byUp" aria-pressed="false" title="The date the record was added to iNaturalist">Uploaded</button>
+</span>
+<span id="presets" class="chips" role="group" aria-label="Periods"></span>
+<span class="dates"><input id="from" type="date" aria-label="From"> to <input id="to" type="date" aria-label="To"></span>
+</div>
+<div class="histwrap"><canvas id="over" role="img" aria-label="Records per year, every year, on a log scale. Click a year to zoom to it."></canvas><p id="unit" class="unit"></p><canvas id="hist" role="img"></canvas><div id="htip" class="htip" hidden></div></div>
+<p id="hint" class="hint">Top: every year, bar height on a log scale so sparse early years show. Click or drag across years to zoom in. Bottom: the period in view. Drag to pick a period, click a bar to zoom into it, double-click for all dates. Bars count records that still need an ID, so older periods look emptier: many of their records have been identified since.</p>
+</section>
+<aside id="card" class="card" hidden></aside>
+<script>var META={"atlas_url":"embeddings.html","bbox":[-136.5536194444,48.2947566667,-114.4631825,59.991425],"day0":"2025-01-16","days":604,"flags":[],"group_ids":{"Actinopterygii":47178,"Amphibia":20978,"Arachnida":47119,"Aves":3,"Fungi":47170,"Insecta":47158,"Mammalia":40151,"Mollusca":47115,"Plantae":47126,"Reptilia":26036},"groups":["Actinopterygii","Amphibia","Arachnida","Aves","Fungi","Insecta","Mammalia","Mollusca","Plantae","Reptilia"],"hist0":0,"imprecise_m":1000,"max_url":8000,"n":10000,"names":{"Actinopterygii":"Fish (Actinopterygii)","Amphibia":"Amphibians (Amphibia)","Arachnida":"Spiders and allies (Arachnida)","Aves":"Birds (Aves)","Fungi":"Fungi and lichens (Fungi)","Insecta":"Insects (Insecta)","Mammalia":"Mammals (Mammalia)","Mollusca":"Molluscs (Mollusca)","Plantae":"Plants (Plantae)","Reptilia":"Reptiles (Reptilia)"},"parks":"bc-parks.bin?v=5e23d3164b0f","place_id":7085,"ranks":["class","complex","epifamily","family","genus","hybrid","infraclass","infraorder","kingdom","order","parvorder","phylum","section","species","subclass","subfamily","subgenus","suborder","subphylum","subspecies","subterclass","subtribe","superfamily","superorder","tribe","variety","zoosection","zoosubsection"],"sha256":"f5089aea8cf58c7a98958e9767dcc8b14aa5f8077a95b831726ab67659b99833","shards":[{"file":"pool-0.bin?v=f5089aea8cf5","n":9330},{"file":"pool-1.bin?v=f5089aea8cf5","n":670}],"taxa":"pool-taxa.bin?v=f5089aea8cf5","taxa_n":2583};var BASEMAPS={"dark": "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json", "light": "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"};
+// The taxon picker and the Identify link. Each taxa row is [latin, common, iNaturalist id, rank,
+// parent row]; a record matches a taxon when the taxon is its own or any ancestor, so Bryophyta keeps
+// every moss. Typing suggests taxa of any rank whose latin or common name holds the text, those with
+// the most records below them first. Each pick is a chip: records under any included chip show, and
+// records under an excluded chip leave. Taxa files built without the tree have no parent column, so a
+// chip then matches only the taxon it names.
+var TX=(function(){
+'use strict';
+var MAX_IDS=50,SUGGEST=8,memo=null,cmemo=null;
+function index(T){
+  if(memo&&memo.T===T)return memo;
+  var n=T.length,par=new Int32Array(n),row=new Map();
+  for(var i=0;i<n;i++){row.set(T[i][2],i);par[i]=T[i].length>4?T[i][4]:-1;}
+  return memo={T:T,par:par,row:row};
+}
+// 1 for each row that is a hit or lies below one. Each row is settled once: a walk up stops at the
+// first row already known, then marks the rows it passed.
+function below(ix,hit){
+  var n=hit.length,st=new Uint8Array(n),path=[],i,j,k,v;
+  for(i=0;i<n;i++){
+    for(j=i,path.length=0;j>=0&&!st[j]&&!hit[j];j=ix.par[j])path.push(j);
+    v=j<0?2:hit[j]?1:st[j];if(j>=0)st[j]=v;
+    for(k=0;k<path.length;k++)st[path[k]]=v;
+  }
+  for(i=0;i<n;i++)st[i]=st[i]===1?1:0;
+  return st;
+}
+// Records at or below each row, from each record's row in tax (the first n records).
+function counts(T,tax,n){
+  if(cmemo&&cmemo.T===T&&cmemo.n===n)return cmemo.c;
+  var ix=index(T),own=new Float64Array(T.length),c=new Float64Array(T.length),i,j;
+  for(i=0;i<n;i++)if(tax[i]<T.length)own[tax[i]]++;
+  for(i=0;i<T.length;i++)if(own[i])for(j=i;j>=0;j=ix.par[j])c[j]+=own[i];
+  cmemo={T:T,n:n,c:c};return c;
+}
+function suggest(T,text,cnt,picks){
+  var q=String(text||'').trim().toLowerCase(),out=[],had={};
+  if(!T||q.length<2)return out;
+  picks.forEach(function(p){had[p.id]=1;});
+  for(var i=0;i<T.length;i++)if(!had[T[i][2]]&&(T[i][0].toLowerCase().indexOf(q)>=0||
+    T[i][1].toLowerCase().indexOf(q)>=0))out.push(i);
+  out.sort(function(a,b){return (cnt?cnt[b]-cnt[a]:0)||a-b;});
+  return out.slice(0,SUGGEST);
+}
+// What the picks match: inc and exc, 1 per taxa row at or below an included or excluded pick (null
+// for none, or before the taxa load); ids and not, the included and excluded iNaturalist taxa for
+// Identify's taxon_id and without_taxon_id.
+function filter(T,picks){
+  var out={inc:null,exc:null,ids:[],not:[]};
+  picks.forEach(function(p){(p.not?out.not:out.ids).push(p.id);});
+  if(!T)return out;
+  var ix=index(T);
+  function hits(ids){var h=new Uint8Array(T.length);
+    ids.forEach(function(id){var r=ix.row.get(id);if(r!=null)h[r]=1;});return below(ix,h);}
+  if(out.ids.length)out.inc=hits(out.ids);
+  if(out.not.length)out.exc=hits(out.not);
+  return out;
+}
+// The picks as a hash value, "311249,-64615", and back.
+function write(picks){return picks.map(function(p){return (p.not?'-':'')+p.id;}).join(',');}
+function read(s){var out=[],seen={};String(s||'').split(',').forEach(function(t){
+  var m=/^(-?)(\d+)$/.exec(t.trim());if(m&&!seen[m[2]]){seen[m[2]]=1;out.push({id:+m[2],not:!!m[1]});}});
+  return out;}
+// Picks for the old q hash value, "Carex, -Carex aquatilis": each name becomes the taxon of that
+// latin or common name (any case), else its first suggestion, and a minus leaves it out.
+function resolve(T,s,cnt){var out=[];
+  String(s||'').split(',').forEach(function(t){t=t.trim();var not=t[0]==='-';if(not)t=t.slice(1).trim();
+    var q=t.toLowerCase(),best=-1,bs=0;if(!T||!q)return;
+    // a latin name beats a common one, then the taxon with more records
+    for(var i=0;i<T.length;i++){var v=T[i][0].toLowerCase()===q?2:T[i][1].toLowerCase()===q?1:0;
+      if(v&&(v>bs||v===bs&&cnt&&cnt[i]>cnt[best])){best=i;bs=v;}}
+    if(best<0)best=suggest(T,q,cnt,out)[0];
+    if(best!=null&&best>=0&&!out.some(function(p){return p.id===T[best][2];}))
+      out.push({id:T[best][2],not:not});});
+  return out;}
+// The taxon selection as terms a shared selection module can take over: each group chip, shortcut
+// and picked taxon is {dim:'taxon', kind:'group'|'preset'|'clade', id, label, exclude, mask(),
+// inat()}, mask() 1 per record the term covers and inat() its Identify parameters. Includes combine
+// with OR and excludes subtract. o: T, picks, groups (the chosen group names, [] for all), meta, the
+// records' tax, grp and n, and split (the shortcut names to list taxon by taxon, optional).
+function terms(o){
+  var out=[],m=o.meta,gid=m.group_ids||{},left=o.picks.slice(),ix=o.T&&index(o.T),
+    tree=!!(o.T&&o.T.length&&o.T[0].length>4);
+  function recs(ids){var f=filter(o.T,ids.map(function(id){return {id:id};})).inc,r=new Uint8Array(o.n);
+    if(f)for(var i=0;i<o.n;i++)r[i]=o.tax[i]<f.length?f[o.tax[i]]:0;return r;}
+  function name(id){var r=ix?ix.row.get(id):null;return r==null?'Taxon '+id:o.T[r][0];}
+  o.groups.forEach(function(g){var k=m.groups.indexOf(g),id=gid[g]||null;
+    out.push({dim:'taxon',kind:'group',id:id,label:m.names[g]||g,exclude:false,
+      mask:function(){var r=new Uint8Array(o.n);for(var i=0;i<o.n;i++)r[i]=o.grp[i]===k?1:0;return r;},
+      inat:function(){return {params:id?{taxon_id:String(id)}:{iconic_taxa:g},exact:true};}});});
+  function term(kind,ids,label,not){var key=not?'without_taxon_id':'taxon_id',p={};p[key]=ids.join(',');
+    out.push({dim:'taxon',kind:kind,id:kind==='preset'?ids.slice():ids[0],label:label,exclude:not,
+      mask:function(){return recs(ids);},inat:function(){return {params:p,exact:tree};}});}
+  (m.presets||[]).forEach(function(c){if((o.split||[]).indexOf(c[0])>=0)return;var hit=c[1].map(function(id){
+    return left.filter(function(p){return p.id===id;})[0];});
+    if(hit.every(Boolean)&&hit.every(function(p){return p.not===hit[0].not;})){
+      left=left.filter(function(p){return hit.indexOf(p)<0;});term('preset',c[1],c[0],hit[0].not);}});
+  left.forEach(function(p){term('clade',[p.id],name(p.id),p.not);});
+  return out;}
+// Whether taxon id lies at or below any of ids.
+function within(T,id,ids){var ix=index(T),r=ix.row.get(id);
+  for(;r!=null&&r>=0;r=ix.par[r])if(ids.indexOf(T[r][2])>=0)return true;return false;}
+// The search box and its suggestion list; the picks show as chips in the selection bar (map_chips.js).
+// o: input, list (suggestions), msg (a note under the input), picks (kept in place), taxa() and
+// counts() for the current table, ranks, nf, and onChange after every change.
+function picker(o){
+  var act=-1,rows=[];
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;
+    if(text!=null)e.textContent=text;return e;}
+  function changed(){o.onChange();}
+  function show(){
+    var T=o.taxa();rows=suggest(T,o.input.value,T&&o.counts(),o.picks);act=rows.length?0:-1;
+    o.list.textContent='';
+    rows.forEach(function(r,k){var t=T[r],c=o.counts(),li=el('li');li.id='sg'+k;
+      li.setAttribute('role','option');
+      li.appendChild(el('b',null,t[0]));
+      li.appendChild(el('span',null,[t[1],t[3]!==255?o.ranks[t[3]]:'',c[r]?o.nf.format(c[r])+
+        (c[r]===1?' record':' records'):''].filter(Boolean).join(' · ')));
+      li.onpointerdown=function(e){e.preventDefault();pick(k);};o.list.appendChild(li);});
+    var q=o.input.value.trim();o.msg.textContent=q.length===1?'Type one more letter':
+      q.length>1&&T&&!rows.length?'No taxon matches':'';
+    var open=rows.length>0;o.list.hidden=!open;o.input.setAttribute('aria-expanded',String(open));
+    mark();}
+  function mark(){[].forEach.call(o.list.children,function(li,k){
+    li.setAttribute('aria-selected',String(k===act));});
+    if(act>=0)o.input.setAttribute('aria-activedescendant','sg'+act);
+    else o.input.removeAttribute('aria-activedescendant');}
+  function hide(){o.list.hidden=true;rows=[];act=-1;o.input.setAttribute('aria-expanded','false');mark();}
+  function pick(k){var r=rows[k];if(r==null)return;o.picks.push({id:o.taxa()[r][2],not:false});
+    o.input.value='';hide();changed();}
+  o.input.addEventListener('input',show);
+  o.input.addEventListener('focus',show);
+  o.input.addEventListener('blur',hide);
+  o.input.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){if(o.list.hidden)show();if(!rows.length)return;
+      act=(act+(e.key==='ArrowDown'?1:rows.length-1))%rows.length;mark();e.preventDefault();}
+    else if(e.key==='Enter'){if(act>=0){pick(act);e.preventDefault();}}
+    else if(e.key==='Escape')hide();
+    else if(e.key==='Backspace'&&!o.input.value&&o.picks.length){o.picks.pop();changed();}});
+  // A shortcut's state: 'inc' when all its taxa are picked, 'not' when all are left out, else ''.
+  function state(ids){var st=null;ids.forEach(function(id){var p=o.picks.filter(function(q){
+    return q.id===id;})[0],v=p?(p.not?'not':'inc'):'';st=st===null||st===v?v:'';});return st||'';}
+  return {changed:changed,state:state,
+    // a click on a shortcut picks its taxa, the next leaves them out, the third removes them
+    cycle:function(ids){var next={'':'inc',inc:'not',not:''}[state(ids)];
+      for(var k=o.picks.length-1;k>=0;k--)if(ids.indexOf(o.picks[k].id)>=0)o.picks.splice(k,1);
+      if(next)ids.forEach(function(id){o.picks.push({id:id,not:next==='not'});});changed();return next;}};
+}
+// The Identify link: the same records on iNaturalist, as far as its filters can say it. iNaturalist
+// counts a taxon's descendants under taxon_id and without_taxon_id, as the map does. lost names what
+// the link had to leave out for MAX_IDS or the URL length: 'taxa' (it then opens every taxon) and
+// 'not' (it then keeps the excluded taxa). A null box b leaves the bounding box out; extra params,
+// such as a park's place_id, override the rest.
+function identifyUrl(st,b,meta,extra){
+  var q=new URLSearchParams({quality_grade:'needs_id',place_id:meta.place_id}),r=function(v,m){
+    return Math.max(-m,Math.min(m,v)).toFixed(4);},lost=[];
+  if(b){q.set('swlat',r(b.s,90));q.set('swlng',r(b.w,180));q.set('nelat',r(b.n,90));
+    q.set('nelng',r(b.e,180));}
+  for(var k in extra||{})q.set(k,extra[k]);
+  var g=st.groups;
+  if(g.length&&g.length<st.all&&g.indexOf('rest')<0)q.set('iconic_taxa',g.join(','));
+  if(st.d1)q.set(st.up?'created_d1':'d1',st.d1);if(st.d2)q.set(st.up?'created_d2':'d2',st.d2);
+  if(st.months.length)q.set('month',st.months.join(','));
+  // iNaturalist has a search parameter for each status filter, so Identify opens the same records; a
+  // left-out status ('not') is its false
+  var o=st.only||{};['introduced','threatened'].forEach(function(k){if(o[k])q.set(k,String(o[k]!=='not'));});
+  if(o.exact){q.set('obscuration','none');q.set('acc_below_or_unknown',meta.imprecise_m+1);}
+  var base='https://www.inaturalist.org/observations/identify?',u=base+q;
+  function add(key,ids,what){if(!ids||!ids.length)return;
+    if(ids.length<=MAX_IDS){q.set(key,ids.join(','));if((base+q).length<meta.max_url){u=base+q;return;}
+      q.delete(key);}
+    lost.push(what);}
+  add('taxon_id',st.taxa,'taxa');add('without_taxon_id',st.not,'not');
+  return {url:u,lost:lost};
+}
+return {filter:filter,suggest:suggest,counts:counts,read:read,write:write,resolve:resolve,within:within,
+  terms:terms,picker:picker,identifyUrl:identifyUrl};
+})();
+
+// The Identify button for an exact link in several batches: it names the batch it opens, each click
+// opens that batch in a new tab and moves on to the next, stopping at the last, and ‹ › step by hand.
+// The batches opened are kept in localStorage per selection and build, so coming back to the same
+// records on the same build starts at the first batch not yet opened, and a new build starts over.
+// Once every batch is open the button says so and starts over at batch 1.
+// Storage that throws only loses that memory across visits. Progress never goes into the URL hash,
+// so a shared link opens at batch 1.
+var IdStep=(function(){
+'use strict';
+var PRE='idstep:';
+// o: a (the Identify anchor), prev and next (the ‹ › buttons), build (the build's date) and store()
+// (localStorage unless given).
+function IdStep(o){
+  var a=o.a,label=a.textContent,store=o.store||function(){return localStorage;},pre=PRE+o.build+':',
+    MEM={},KEY='',LIST=[],K=0,k=1,CUR=0,ALL=false;
+  // what older builds remembered no longer names the same batches
+  try{var s=store(),old=[];for(var i=0;i<s.length;i++){var n=s.key(i);
+    if(n.indexOf(PRE)===0&&n.indexOf(pre)!==0)old.push(n);}
+    old.forEach(function(n){s.removeItem(n);});}catch(e){}
+  // the batch numbers opened for this selection, read from storage once and kept in memory
+  function done(){if(!MEM[KEY]){var d={};
+      try{(store().getItem(pre+KEY)||'').split(',').forEach(function(x){if(+x)d[+x]=1;});}catch(e){}
+      MEM[KEY]=d;}
+    return MEM[KEY];}
+  function first(){var d=done();for(var j=1;j<K;j++)if(!d[j])return j;return K;}
+  function all(){var d=done();for(var j=1;j<=K;j++)if(!d[j])return false;return true;}
+  function show(){o.prev.hidden=o.next.hidden=K<2;ALL=false;
+    if(K<2){a.textContent=label;return;}
+    ALL=k>=K&&all();
+    a.textContent=ALL?'All '+K+' batches opened · start over':'Open in Identify · batch '+k+' of '+K;
+    a.href=LIST[ALL?0:k-1].url;o.prev.disabled=k<=1;o.next.disabled=k>=K;}
+  function go(j){k=CUR=Math.max(1,Math.min(K,j));show();}
+  // The browser opens the href once the click handlers return, so the label and href move on after.
+  function open(){if(K<2)return;var d=done();
+    if(ALL){d=MEM[KEY]={};k=1;}
+    d[k]=1;
+    try{store().setItem(pre+KEY,Object.keys(d).join(','));}catch(e){}
+    k=CUR=Math.min(K,k+1);setTimeout(show,0);}
+  a.addEventListener('click',open);
+  a.addEventListener('auxclick',function(e){if(e.button===1)open();});
+  o.prev.addEventListener('click',function(){go(k-1);});
+  o.next.addEventListener('click',function(){go(k+1);});
+  return {
+    // The batches for selection key, or fewer than two for a single link u; returns the href.
+    // Until the viewer steps, the batch shown is the first not yet opened, kept as more records load.
+    set:function(key,list,u){if(key!==KEY){KEY=key;CUR=0;}LIST=list;K=list.length>1?list.length:0;
+      k=!K?1:CUR?Math.min(CUR,K):first();show();return K?LIST[ALL?0:k-1].url:u;},
+    open:open,go:go,
+    at:function(){return [k,K];}
+  };
+}
+return IdStep;
+})();
+
+// An area filter for the map: the viewer draws a polygon or loads one from a GeoJSON file, and the
+// map then keeps only the records inside it. map.js calls MapArea once with its map and state, and
+// folds mask() into the status category's kept bit, so a new area costs one CPU pass and one upload
+// of the categories, as a new taxon search does.
+//
+// An area is a list of rings, each a flat [lon, lat, lon, lat, ...] array on a 0.0001 degree grid,
+// tested with the even-odd rule over all rings: holes and several polygons need no special case, and
+// a self-intersecting drawing still has an inside. The URL hash carries the same rings, so a shared
+// link restores the same area and the same count. Each ring is coded as zigzag varint steps from
+// the previous corner, 5 bits to a base64url character, rings joined by '.'.
+//
+// A park is an area too. The park picker lists BC's parks, reserves, protected areas and
+// conservancies (page_map.py ships the list next to the page), and the hash carries bcpark=<ORCS number>.
+// A park that matches an iNaturalist place takes that place's own boundary, fetched when picked, so
+// the map and the Identify link (which filters by place_id) count the same place; a park without one
+// takes its BC Parks boundary from the list and an Identify link as a drawn area gets. park=<place
+// id> from older links still loads.
+var MapArea=(function(){
+'use strict';
+var Q=1e4,MAXV=1500,MAXMB=50,BATCH=200,MAXB=50,BOXQ={per_page:BATCH,reviewed:'false'},MAXROWS=200,
+  API='https://api.inaturalist.org/v1/places/',B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+function encode(rings){
+  return rings.map(function(r){var s='',px=0,py=0;
+    for(var i=0;i<r.length;i++){var v=Math.round(r[i]*Q),d=v-(i%2?py:px);if(i%2)py=v;else px=v;
+      var z=d<0?-2*d-1:2*d;while(z>=32){s+=B64[32|z%32];z=Math.floor(z/32);}s+=B64[z];}
+    return s;}).join('.');
+}
+function decode(s){
+  return clean(s.split('.').map(function(part){var r=[],v=0,m=1,px=0,py=0;
+    for(var i=0;i<part.length;i++){var c=B64.indexOf(part[i]);if(c<0)throw new Error('bad character');
+      v+=(c%32)*m;m*=32;if(c>=32)continue;
+      var d=v%2?-(v+1)/2:v/2;v=0;m=1;
+      if(r.length%2)r.push((py+=d)/Q);else r.push((px+=d)/Q);}
+    if(v||r.length%2)throw new Error('cut short');
+    return r;}));
+}
+// Rounds rings to the grid, drops repeated corners and the closing one, and rings with fewer than
+// three corners left.
+function clean(rings){
+  var out=[];
+  rings.forEach(function(r){var o=[];
+    for(var i=0;i<r.length;i+=2){var x=Math.round(r[i]*Q)/Q,y=Math.round(r[i+1]*Q)/Q;
+      if(!isFinite(x)||!isFinite(y))throw new Error('a corner is not a number');
+      var n=o.length;if(n&&o[n-2]===x&&o[n-1]===y)continue;o.push(x,y);}
+    var n=o.length;if(n>=4&&o[0]===o[n-2]&&o[1]===o[n-1])o.length=n-2;
+    if(o.length>=6)out.push(o);});
+  return out;
+}
+function corners(rings){return rings.reduce(function(a,r){return a+r.length/2;},0);}
+// Keeps at most max corners over all rings. Each corner gets the distance at which Douglas-Peucker
+// would still keep it (capped by its parent's, so the order nests); the max largest win. A ring's
+// two anchor corners rank by the ring's size, so tiny islands drop out whole.
+function simplify(rings,max){
+  if(corners(rings)<=max)return rings;
+  var w=rings.map(function(r){
+    var n=r.length/2,imp=new Float64Array(n),f=0,fd=-1,i;
+    for(i=1;i<n;i++){var dx=r[2*i]-r[0],dy=r[2*i+1]-r[1];if(dx*dx+dy*dy>fd){fd=dx*dx+dy*dy;f=i;}}
+    var ext=Math.sqrt(fd);imp[0]=imp[f]=ext;
+    var st=[[0,f,ext],[f,n,ext]];
+    while(st.length){var s=st.pop(),a=s[0],b=s[1],ax=r[2*a],ay=r[2*a+1],bx=r[2*(b%n)],by=r[2*(b%n)+1],
+        best=-1,k=-1,ux=bx-ax,uy=by-ay,L=ux*ux+uy*uy;
+      for(i=a+1;i<b;i++){var px=r[2*i]-ax,py=r[2*i+1]-ay,t=L?Math.max(0,Math.min(1,(px*ux+py*uy)/L)):0,
+          ex=px-t*ux,ey=py-t*uy,d=ex*ex+ey*ey;if(d>best){best=d;k=i;}}
+      if(k<0)continue;var dk=Math.min(s[2],Math.sqrt(best));imp[k]=dk;st.push([a,k,dk],[k,b,dk]);}
+    return imp;});
+  var all=[];w.forEach(function(x){for(var i=0;i<x.length;i++)all.push(x[i]);});
+  all.sort(function(a,b){return b-a;});var cut=all[max],out=[],live=[];
+  rings.forEach(function(r,j){var o=[];
+    for(var i=0;i<w[j].length;i++)if(w[j][i]>cut)o.push(r[2*i],r[2*i+1]);
+    o=clean([o]);if(o.length){out.push(o[0]);live.push(r);}});
+  // corners spent on rings that dropped out go to the rest
+  return live.length&&live.length<rings.length?simplify(live,max):out;
+}
+// The polygons in a GeoJSON object (FeatureCollection, Feature, GeometryCollection, Polygon or
+// MultiPolygon), as rings. GeoJSON is longitude and latitude in WGS 84; an older file that names
+// another CRS, or holds coordinates beyond those ranges, is refused.
+function fromGeoJSON(o){
+  var crs=o&&o.crs&&o.crs.properties&&String(o.crs.properties.name||'');
+  if(crs&&!/CRS84$|EPSG:+4326$/i.test(crs)){var code=crs.match(/EPSG:+(\d+)/i);
+    throw new Error('This file is in '+(code?'EPSG:'+code[1]:crs)+', not longitude and latitude. '+
+      'Save it again as GeoJSON in WGS 84 (EPSG:4326), e.g. in QGIS with Export, Save Features As.');}
+  var rings=[];
+  (function walk(g){if(!g||typeof g!=='object')return;
+    if(g.type==='FeatureCollection')(g.features||[]).forEach(walk);
+    else if(g.type==='Feature')walk(g.geometry);
+    else if(g.type==='GeometryCollection')(g.geometries||[]).forEach(walk);
+    else if(g.type==='Polygon')add(g.coordinates);
+    else if(g.type==='MultiPolygon')(g.coordinates||[]).forEach(add);})(o);
+  function add(poly){(poly||[]).forEach(function(ring){var r=[];
+    (ring||[]).forEach(function(c){var x=+c[0],y=+c[1];
+      if(!(Math.abs(x)<=180&&Math.abs(y)<=90))throw new Error('Coordinates such as '+c[0]+', '+c[1]+
+        ' are not longitude and latitude; the file is likely in a projected CRS such as BC Albers '+
+        '(EPSG:3005). Save it again as GeoJSON in WGS 84 (EPSG:4326).');
+      r.push(x,y);});rings.push(r);});}
+  if(!rings.length)throw new Error('This file holds no Polygon or MultiPolygon.');
+  return rings;
+}
+// Edges sorted into horizontal bands, so a point is tested only against the edges crossing its band.
+function index(rings){
+  var ne=corners(rings),x0=new Float64Array(ne),y0=new Float64Array(ne),x1=new Float64Array(ne),
+    y1=new Float64Array(ne),bb=[Infinity,Infinity,-Infinity,-Infinity],e=0;
+  rings.forEach(function(r){var n=r.length/2;for(var i=0;i<n;i++){var j=(i+1)%n;
+    x0[e]=r[2*i];y0[e]=r[2*i+1];x1[e]=r[2*j];y1[e]=r[2*j+1];e++;
+    bb[0]=Math.min(bb[0],r[2*i]);bb[1]=Math.min(bb[1],r[2*i+1]);
+    bb[2]=Math.max(bb[2],r[2*i]);bb[3]=Math.max(bb[3],r[2*i+1]);}});
+  var nb=Math.max(1,Math.min(4096,ne)),h=(bb[3]-bb[1])/nb||1,cnt=new Int32Array(nb+1),k,b;
+  function band(y){return Math.max(0,Math.min(nb-1,Math.floor((y-bb[1])/h)));}
+  for(k=0;k<ne;k++)for(b=band(Math.min(y0[k],y1[k]));b<=band(Math.max(y0[k],y1[k]));b++)cnt[b+1]++;
+  for(b=0;b<nb;b++)cnt[b+1]+=cnt[b];
+  var list=new Int32Array(cnt[nb]),fill=cnt.slice(0,nb);
+  for(k=0;k<ne;k++)for(b=band(Math.min(y0[k],y1[k]));b<=band(Math.max(y0[k],y1[k]));b++)list[fill[b]++]=k;
+  return {x0:x0,y0:y0,x1:x1,y1:y1,bb:bb,band:band,start:cnt,list:list};
+}
+function inside(I,x,y){
+  var bb=I.bb;if(x<bb[0]||x>bb[2]||y<bb[1]||y>bb[3])return 0;
+  var b=I.band(y),c=0;
+  for(var k=I.start[b];k<I.start[b+1];k++){var e=I.list[k],ya=I.y0[e],yb=I.y1[e];
+    if((ya>y)!==(yb>y)&&x<I.x0[e]+(y-ya)*(I.x1[e]-I.x0[e])/(yb-ya))c^=1;}
+  return c;
+}
+
+// Identify links that open these ids exactly, at most BATCH to a link and in order(): per_page shows
+// a whole batch on one page, place_id=any keeps a viewer's default place from hiding any, and
+// reviewed=false leaves out those the viewer has already reviewed. Each batch is {url, n, lo, hi}.
+var IDS='https://www.inaturalist.org/observations/identify?quality_grade=needs_id&reviewed=false'+
+  '&place_id=any&per_page='+BATCH+'&id=';
+// The order the batches open in: newest first, as Identify lists them. A priority order can take
+// its place here without touching the button.
+function order(ids){return Array.prototype.slice.call(ids).sort(function(a,b){return b-a;});}
+// The area's bounding box bb cut to the view v (the whole box when they do not meet), and how many
+// of the records P that pass ok(i) fall inside it: what one Identify link for the box opens. Not
+// exact, as the box also holds records outside the shape.
+function boxed(v,bb,P,ok){
+  var w=Math.max(v.w,bb[0]),s=Math.max(v.s,bb[1]),e=Math.min(v.e,bb[2]),n=Math.min(v.n,bb[3]),m=0,i;
+  if(!(w<e&&s<n)){w=bb[0];s=bb[1];e=bb[2];n=bb[3];}
+  for(i=0;i<P.n;i++){var x=P.pos[2*i],y=P.pos[2*i+1];if(x>=w&&x<=e&&y>=s&&y<=n&&ok(i))m++;}
+  return {box:{w:w,s:s,e:e,n:n},m:m};
+}
+function batches(ids){
+  var s=order(ids),out=[];
+  for(var i=0;i<s.length;i+=BATCH){var b=s.slice(i,i+BATCH);
+    out.push({url:IDS+b.join(','),n:b.length,lo:b[b.length-1],hi:b[0]});}
+  return out;
+}
+// The park picker's search. Names fold to lower case without accents or punctuation, and the query
+// drops the designation words, so "Garibaldi Park" and "garibaldi" find the same parks.
+var DESIG=/\b(provincial|park|ecological reserve|protected area|conservancy|recreation area)\b/g,
+  TAG={Park:'PP','Ecological reserve':'ER','Protected area':'PA','Recreation area':'RA',Conservancy:'Conservancy'};
+function fold(s){return String(s||'').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
+// s folded, and for each of its characters the index in s it came from, to bold a match in place
+function folded(s){var f='',at=[],i,j,c;
+  for(i=0;i<s.length;i++){c=s[i].normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().replace(/[^a-z0-9]/g,' ');
+    for(j=0;j<c.length;j++)if(c[j]!==' '||f&&f[f.length-1]!==' '){f+=c[j];at.push(i);}}
+  if(f[f.length-1]===' '){f=f.slice(0,-1);at.pop();}
+  return {s:f,at:at};}
+// A row of the park list ([key, name, kind, place, bbox, rings, other names]) as the picker uses it.
+function entry(r,kinds){var k=kinds[r[2]];return {key:r[0],name:r[1],kind:k,tag:TAG[k]||k,place:r[3],bb:r[4],
+  rings:r[5],n:folded(r[1]),alt:fold(r[6])};}
+// How a park matches the text t: rank 0 at the start of a word of its name, 1 elsewhere in it, 2 in
+// its other names, with a and b the name's matched characters; null for no match.
+function match(p,t){var w=fold(t),c=w.replace(DESIG,' ').replace(/ +/g,' ').trim()||w,i;
+  if(!c)return {rank:0};
+  i=(' '+p.n.s).indexOf(' '+c);if(i<0)i=p.n.s.indexOf(c);
+  if(i>=0)return {rank:p.n.s[i-1]===' '||!i?0:1,a:p.n.at[i],b:p.n.at[i+c.length-1]+1};
+  return p.alt.indexOf(c)>=0?{rank:2}:null;}
+// The picker's rows, in groups: with no text, the selected parks, then those in view, then the rest,
+// each by name; with text, the matches by rank, then name. parks is in name order. At most MAXROWS
+// rows; n counts them all, more those left out.
+function listing(parks,t,sel,view){var g=[],n=0,left=MAXROWS;
+  function put(label,rows){n+=rows.length;rows=rows.slice(0,left);left-=rows.length;
+    if(rows.length)g.push({label:label,rows:rows});}
+  if(!fold(t)){var s=[],v=[],o=[];parks.forEach(function(p){(sel(p)?s:view(p)?v:o).push({p:p});});
+    put('Selected',s);put('In view',v);put('All parks',o);}
+  else{var h=[];parks.forEach(function(p){var m=match(p,t);if(m){m.p=p;h.push(m);}});
+    h.sort(function(x,y){return x.rank-y.rank;});put('',h);}
+  return {groups:g,n:n,more:n-MAXROWS+left};}
+
+// ctx: map, S, LAST, P() and keep() (the current records and kept flags), change() to refilter,
+// hash, park and bcpark (the area, place ids and parks from the URL, ids comma-separated), fit (no
+// view in the URL, so fit the map to the parks from it), place (the region's iNaturalist place id),
+// parks (the park list's file), get(url) (an ArrayBuffer promise, gunzipped), sel() (the selection
+// as text) and step (the Identify button, an IdStep).
+//
+// The area is one drawn or loaded shape, or one or more parks, which combine with OR: a record
+// inside any of them is kept. Picking a park replaces a shape, and a shape replaces the parks.
+function MapArea(ctx){
+  // AREAS: {key (BC park, '' for none), place (iNaturalist place id, 0 for none), label, drawn,
+  // rings and idx (null while the place's boundary loads)}
+  var map=ctx.map,AREAS=[],VER=0,MASK=null,NOTE='',LINK='',LINKS=[],BOX=null,PEND='',SEQ=0,CHIPS='',UID='apark'+(++MapArea.n),
+    mode=false,ended=0,pts=[],cursor=null,ready=false,color=getComputedStyle(document.documentElement)
+      .getPropertyValue('--share').trim()||'#c2410c',nf=new Intl.NumberFormat('en-CA');
+  var box=document.createElement('div');box.className='maplibregl-ctrl area';
+  box.innerHTML='<div class="abtns"><button type="button" data-a="draw">Draw area</button>'+
+    '<label class="afile">Load GeoJSON<input type="file" accept=".geojson,.json,application/geo+json,'+
+    'application/json"></label><button type="button" data-a="finish" hidden>Finish</button>'+
+    '<button type="button" data-a="cancel" hidden>Cancel</button><button type="button" data-a="clear" '+
+    'hidden>Clear area</button></div><div class="apark"><div class="acombo"><input type="text" '+
+    'role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="'+UID+'" placeholder='+
+    '"Find BC parks" aria-label="BC parks and protected areas" autocomplete="off" spellcheck="false">'+
+    '<button type="button" class="atog" tabindex="-1" aria-label="Show the parks" aria-controls="'+UID+'">'+
+    '▾</button></div><div class="apanel" hidden><div class="ahdr"><span></span><button type="button">'+
+    'Clear all</button></div><div class="alist" id="'+UID+'" role="listbox" aria-multiselectable="true" '+
+    'aria-label="BC parks"></div><p class="amore" hidden></p></div></div><div class="achips" hidden></div>'+
+    '<p class="anote" aria-live="polite" hidden></p><a class="abox" target="_blank" rel="noopener" hidden></a>'+
+    '<p class="alive" aria-live="polite"></p>';
+  function el(a){return box.querySelector('[data-a="'+a+'"]');}
+  var note=box.querySelector('.anote'),file=box.querySelector('.afile input'),q=box.querySelector('.acombo input'),
+    tog=box.querySelector('.atog'),panel=box.querySelector('.apanel'),hdr=box.querySelector('.ahdr'),
+    list=box.querySelector('.alist'),more=box.querySelector('.amore'),live=box.querySelector('.alive'),
+    chips=box.querySelector('.achips'),abox=box.querySelector('.abox');
+  map.addControl({onAdd:function(){return box;},onRemove:function(){}},'top-left');
+  function loaded(){return AREAS.filter(function(a){return a.idx;});}
+  function drawn(){return AREAS.length&&AREAS[0].drawn;}
+  function names(a){var l=a.map(function(x){return x.label;});
+    return l.length<2?l.join(''):l.slice(0,-1).join(', ')+' and '+l[l.length-1];}
+  function ui(){
+    el('draw').hidden=mode;box.querySelector('.afile').hidden=mode;box.querySelector('.apark').hidden=mode;el('finish').hidden=!mode;
+    if(mode)close();
+    el('cancel').hidden=!mode;el('clear').hidden=mode||!AREAS.length;el('finish').disabled=pts.length<3;
+    var own=AREAS.filter(function(a){return a.key&&!a.place&&a.idx;}),
+      t=mode?(pts.length<3?'Click or tap the map to add corners.':'Double-click, tap the first corner '+
+      'or press Finish to close the area.')+' Esc cancels.':(NOTE+' '+(own.length?'iNaturalist has no place for '+
+      names(own)+', so the map uses '+(own.length>1?'their BC Parks boundaries. ':'its BC Parks boundary. '):'')+LINK).trim();
+    note.textContent=t;note.hidden=!t;abox.hidden=mode||!BOX;
+    if(BOX){abox.href=BOX.url;abox.textContent='Or open the box around '+(drawn()?'the shape':names(loaded()))+
+      ' in one link, about '+nf.format(BOX.m)+' records';}
+    sync();var ps=drawn()?[]:AREAS,sig=ps.map(function(a){return a.key+' '+a.place+' '+!!a.idx+' '+a.label;}).join('|');
+    chips.hidden=mode||!ps.length;if(sig===CHIPS)return;CHIPS=sig;chips.innerHTML='';
+    ps.forEach(function(a){var c=document.createElement('span'),x=document.createElement('button');
+      c.className='achip'+(a.idx?'':' aload');c.textContent=a.label||'Park '+a.place;
+      x.type='button';x.textContent='×';x.setAttribute('aria-label','Remove '+(a.label||'this park'));
+      x.onclick=function(){remove(a);};c.appendChild(x);chips.appendChild(c);});
+  }
+  function paint(){
+    if(!ready)return;var f=[];
+    loaded().forEach(function(a){a.rings.forEach(function(r){var c=[];for(var i=0;i<r.length;i+=2)c.push([r[i],r[i+1]]);
+      c.push(c[0]);f.push({type:'Feature',properties:{},geometry:{type:'LineString',coordinates:c}});});});
+    if(mode&&pts.length){f.push({type:'Feature',properties:{},geometry:{type:'LineString',
+      coordinates:cursor?pts.concat([cursor]):pts}});
+      pts.forEach(function(p,i){f.push({type:'Feature',properties:{first:i===0},
+        geometry:{type:'Point',coordinates:p}});});}
+    map.getSource('area').setData({type:'FeatureCollection',features:f});
+  }
+  map.on('load',function(){
+    map.addSource('area',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+    map.addLayer({id:'area-line',type:'line',source:'area',filter:['==',['geometry-type'],'LineString'],
+      paint:{'line-color':color,'line-width':2.5}});
+    map.addLayer({id:'area-pt',type:'circle',source:'area',filter:['==',['geometry-type'],'Point'],
+      paint:{'circle-color':'#fff','circle-stroke-color':color,'circle-stroke-width':2,
+        'circle-radius':['case',['get','first'],7,4]}});
+    ready=true;paint();});
+  // The areas changed: a new mask, and a refilter unless quiet.
+  function refresh(quiet){VER++;MASK=null;performance.mark('area');paint();ui();if(!quiet)ctx.change();}
+  // Sets a drawn or loaded shape in place of any area, or clears the area with null.
+  function set(rings,msg,quiet){SEQ++;PEND='';NOTE=msg||'';
+    AREAS=rings&&rings.length?[{key:'',place:0,label:'',drawn:true,rings:rings,idx:index(rings)}]:[];
+    refresh(quiet);
+  }
+  function prepare(rings){
+    var raw=corners(rings),r=simplify(clean(rings),MAXV),n=corners(r);
+    if(!r.length)throw new Error('The area has no ring with three distinct corners.');
+    return {rings:r,msg:raw>MAXV?'Simplified from '+nf.format(raw)+' to '+nf.format(n)+' corners. ':''};
+  }
+  function start(){mode=true;pts=[];cursor=null;map.doubleClickZoom.disable();
+    map.getCanvas().style.cursor='crosshair';paint();ui();}
+  function stop(){mode=false;ended=performance.now();pts=[];cursor=null;map.doubleClickZoom.enable();
+    map.getCanvas().style.cursor='';paint();ui();}
+  function finish(){if(pts.length<3)return;
+    var r=[];pts.forEach(function(p){r.push(p[0],p[1]);});stop();
+    try{var p=prepare([r]);set(p.rings,p.msg);}catch(e){NOTE=e.message;ui();}}
+  function near(p,pt,px){var q=map.project(p);return Math.hypot(q.x-pt.x,q.y-pt.y)<=px;}
+  map.on('click',function(e){if(!mode)return;
+    if(pts.length>=3&&near(pts[0],e.point,14)){finish();return;}
+    if(pts.length&&near(pts[pts.length-1],e.point,6))return;
+    pts.push([e.lngLat.lng,e.lngLat.lat]);paint();ui();});
+  map.on('dblclick',function(e){if(mode){e.preventDefault();finish();}});
+  map.on('mousemove',function(e){if(mode&&pts.length){cursor=[e.lngLat.lng,e.lngLat.lat];paint();}});
+  addEventListener('keydown',function(e){if(e.key==='Escape'&&mode)stop();});
+  el('draw').onclick=start;el('cancel').onclick=stop;el('finish').onclick=finish;
+  el('clear').onclick=function(){set(null);};
+  file.onchange=function(){var f=file.files[0];file.value='';if(!f)return;
+    if(f.size>MAXMB*1048576){NOTE='This file is over '+MAXMB+' MB.';ui();return;}
+    f.text().then(function(t){var p=prepare(fromGeoJSON(JSON.parse(t)));set(p.rings,p.msg);fit(bbox());})
+      .catch(function(e){NOTE='Could not use '+f.name+': '+(e instanceof SyntaxError?'it is not JSON.':e.message);
+        ui();});};
+  // iNaturalist answers a busy moment with an error that carries no CORS header, so try twice more
+  function get(u,n){return fetch(u).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .catch(function(e){if(!n)throw e;return new Promise(function(ok){setTimeout(ok,1500);})
+      .then(function(){return get(u,n-1);});});}
+  function bbox(){var bb=[Infinity,Infinity,-Infinity,-Infinity];
+    loaded().forEach(function(a){var b=a.idx.bb;bb=[Math.min(bb[0],b[0]),Math.min(bb[1],b[1]),
+      Math.max(bb[2],b[2]),Math.max(bb[3],b[3])];});return bb;}
+  function fit(b){map.fitBounds([[b[0],b[1]],[b[2],b[3]]],{padding:40,maxZoom:14});}
+  // Adds a park to the area: b is a park from the list, or {place, name} for another iNaturalist
+  // place. A park that matches a place takes the place's own boundary, fetched now, so the map and
+  // the Identify link (which filters by place_id) count the same place; zoom fits the map to the parks.
+  function add(b,zoom){var was=drawn();if(was)AREAS=[];
+    if(AREAS.some(function(a){return b.key?a.key===b.key:!a.key&&a.place===b.place;}))return;
+    var a={key:b.key||'',place:b.place||0,label:b.name||'',drawn:false,rings:null,idx:null};AREAS.push(a);NOTE='';
+    if(!a.place){a.rings=prepare(decode(b.rings)).rings;a.idx=index(a.rings);refresh();if(zoom)fit(bbox());return;}
+    if(was)refresh();else ui();
+    get(API+a.place,2).then(function(j){
+      var pl=j.results&&j.results[0];if(AREAS.indexOf(a)<0)return;
+      if(!pl||!pl.geometry_geojson)throw new Error('no boundary');
+      a.rings=prepare(fromGeoJSON(pl.geometry_geojson)).rings;a.idx=index(a.rings);a.label=a.label||pl.name;
+      refresh();if(zoom)fit(bbox());})
+      .catch(function(){if(AREAS.indexOf(a)<0)return;AREAS.splice(AREAS.indexOf(a),1);
+        NOTE='Could not load '+(a.label||'that park')+' from iNaturalist.';refresh(true);});}
+  function remove(a){var i=AREAS.indexOf(a);if(i<0)return;AREAS.splice(i,1);NOTE='';refresh();}
+  // The park list, fetched once, when first needed, in name order.
+  var PARKS=null,PARKP=null,ROWS=[],ACT=-1,OPEN=false,LT=0,coll=new Intl.Collator('en');
+  function parks(){if(!PARKP)PARKP=ctx.get(ctx.parks).then(function(buf){
+      var j=JSON.parse(new TextDecoder().decode(buf));
+      PARKS=j.parks.map(function(r){return entry(r,j.kinds);}).sort(function(a,b){return coll.compare(a.name,b.name);});
+      return PARKS;})
+      .catch(function(e){PARKP=null;throw e;});
+    return PARKP;}
+  function find(key){var k=String(key).trim(),b=PARKS.filter(function(p){return p.key===k;})[0];
+    if(!b&&/^\d{1,3}$/.test(k))return find(('000'+k).slice(-4));return b;}
+  // The park picker: a combobox over the park list. Focus stays in the box, the highlighted row is
+  // its aria-activedescendant. Enter, Space or a click ticks or unticks a park and keeps the list
+  // open; a park ticked after typing selects the text, so typing again starts a new search.
+  function picked(p){return AREAS.some(function(a){return !a.drawn&&a.key===p.key;});}
+  function parked(){return AREAS.filter(function(a){return !a.drawn;});}
+  function inView(p){var v=map.getBounds(),b=p.bb;
+    return b[0]<=v.getEast()&&b[2]>=v.getWest()&&b[1]<=v.getNorth()&&b[3]>=v.getSouth();}
+  function say(t){live.textContent='';setTimeout(function(){live.textContent=t;},50);}
+  function parksN(n){return n===1?'1 park':nf.format(n)+' parks';}
+  function span(cls,text){var e=document.createElement('span');e.className=cls;e.textContent=text;return e;}
+  function option(r){var li=document.createElement('div'),p=r.p,nm=span('anm','');li.id=UID+'-'+ROWS.length;
+    li.setAttribute('role','option');li.appendChild(span('acheck',''));
+    if(r.b){nm.appendChild(document.createTextNode(p.name.slice(0,r.a)));
+      nm.appendChild(document.createElement('b')).textContent=p.name.slice(r.a,r.b);
+      nm.appendChild(document.createTextNode(p.name.slice(r.b)));}else nm.textContent=p.name;
+    li.appendChild(nm);var k=li.appendChild(span('akind',p.tag));k.title=p.kind;
+    if(!p.place){k=li.appendChild(span('adrawn','drawn'));k.title='iNaturalist has no place for this park; '+
+      'the map uses its BC Parks boundary';}
+    li.onclick=function(){ACT=ROWS.indexOf(r);active();toggle(p);};ROWS.push(r);r.li=li;return li;}
+  function render(){var o=listing(PARKS,q.value,picked,inView);ROWS=[];list.textContent='';
+    o.groups.forEach(function(g,i){var to=list;
+      if(g.label){to=list.appendChild(document.createElement('div'));var h=to.appendChild(span('ahead',g.label));
+        h.id=UID+'g'+i;h.setAttribute('role','presentation');to.setAttribute('role','group');
+        to.setAttribute('aria-labelledby',h.id);}
+      g.rows.forEach(function(r){to.appendChild(option(r));});});
+    more.textContent=o.n?'Keep typing to narrow: '+parksN(o.more)+' more.':'No BC park matches.';
+    more.hidden=o.n&&!o.more;ACT=-1;active();sync();return o;}
+  function sync(){if(!OPEN)return;var n=parked().length;
+    ROWS.forEach(function(r){r.li.setAttribute('aria-selected',picked(r.p));});
+    hdr.firstChild.textContent=nf.format(n)+' selected · ';hdr.lastChild.hidden=!n;}
+  function active(){ROWS.forEach(function(r,i){r.li.classList.toggle('aact',i===ACT);});
+    if(ACT<0){q.removeAttribute('aria-activedescendant');return;}
+    q.setAttribute('aria-activedescendant',ROWS[ACT].li.id);ROWS[ACT].li.scrollIntoView({block:'nearest'});}
+  function toggle(p){var a=AREAS.filter(function(x){return !x.drawn&&x.key===p.key;})[0];
+    if(a)remove(a);else add(p,true);if(q.value)q.select();
+    say(p.name+(a?' removed':' selected')+', '+parksN(parked().length)+' selected.');}
+  // Below 480px the list is a full-width panel just under the box.
+  function open(){if(OPEN||mode)return;OPEN=true;panel.hidden=false;q.setAttribute('aria-expanded','true');
+    panel.style.top=matchMedia('(max-width:479px)').matches?q.getBoundingClientRect().bottom+4+'px':'';
+    if(PARKS){render();return;}
+    list.textContent='';more.textContent='Loading the list of BC parks.';more.hidden=false;
+    parks().then(function(){if(OPEN)render();})
+      .catch(function(){more.textContent='Could not load the list of BC parks.';});}
+  function close(){if(!OPEN)return;OPEN=false;panel.hidden=true;q.setAttribute('aria-expanded','false');
+    ACT=-1;q.removeAttribute('aria-activedescendant');}
+  q.onfocus=open;q.onclick=open;
+  q.oninput=function(){if(!OPEN)open();else if(PARKS)render();clearTimeout(LT);
+    LT=setTimeout(function(){if(OPEN&&PARKS){var o=listing(PARKS,q.value,picked,inView);
+      say(o.n?parksN(o.n)+(q.value.trim()?' match.':'.'):'No BC park matches.');}},600);};
+  q.onkeydown=function(e){var k=e.key,n=ROWS.length,ps;
+    if(k==='ArrowDown'||k==='ArrowUp'){e.preventDefault();if(!OPEN){open();return;}
+      if(n){ACT=k==='ArrowDown'?Math.min(ACT+1,n-1):Math.max(ACT-1,0);active();}}
+    else if((k==='Home'||k==='End')&&OPEN&&n){e.preventDefault();ACT=k==='Home'?0:n-1;active();}
+    else if(k==='Enter'){e.preventDefault();if(!OPEN){open();return;}
+      if(ACT<0&&q.value.trim()&&n)ACT=0;if(ACT>=0){active();toggle(ROWS[ACT].p);}}
+    else if(k===' '&&OPEN&&ACT>=0){e.preventDefault();toggle(ROWS[ACT].p);}
+    else if(k==='Escape'&&OPEN){e.preventDefault();close();}
+    else if(k==='Backspace'&&!q.value&&(ps=parked()).length){e.preventDefault();remove(ps[ps.length-1]);
+      say(ps[ps.length-1].label+' removed, '+parksN(ps.length-1)+' selected.');}
+    else if(k==='Tab')close();};
+  // clicks in the list and on the toggle keep the focus in the box
+  [panel,tog].forEach(function(e){e.onmousedown=function(ev){ev.preventDefault();};});
+  tog.onclick=function(){if(OPEN)close();else{q.focus();open();}};
+  hdr.lastChild.onclick=function(){set(null);say('No parks selected.');};
+  document.addEventListener('pointerdown',function(e){if(!box.contains(e.target))close();});
+  function ids(s){return String(s||'').split(',').map(function(x){return x.trim();}).filter(Boolean);}
+  var keys=ids(ctx.bcpark),places=ids(ctx.park).map(Number).filter(function(x){return x>0;});
+  if(keys.length||places.length){
+    places.forEach(function(id){add({place:id},ctx.fit);});
+    if(keys.length){var seq0=SEQ;PEND=['bcpark='+keys.map(encodeURIComponent).join(','),
+      places.length?'park='+places.join(','):''].filter(Boolean).join('&');NOTE='Loading the park list.';ui();
+      parks().then(function(){if(seq0!==SEQ)return;PEND='';NOTE='';var gone=[];
+        keys.forEach(function(k){var b=find(k);if(b)add(b,ctx.fit);else gone.push(k);});
+        if(gone.length)NOTE='The list of BC parks has no park '+gone.join(', ')+'.';ui();})
+        .catch(function(){if(seq0===SEQ){PEND='';NOTE='Could not load the list of BC parks.';ui();}});}}
+  else if(ctx.hash){try{set(decode(ctx.hash),'',true);}catch(e){NOTE='The area in this link could not be read.';ui();}}
+  else ui();
+  // the hash parameters: area=<rings>, or bcpark=<keys> and park=<place ids> for the parks; while
+  // the park list loads, the parks the URL names
+  function hash(){if(PEND)return PEND;if(drawn())return 'area='+encode(AREAS[0].rings);
+    var k=[],p=[];AREAS.forEach(function(a){if(a.key)k.push(encodeURIComponent(a.key));else p.push(a.place);});
+    return [k.length?'bcpark='+k.join(','):'',p.length?'park='+p.join(','):''].filter(Boolean).join('&');}
+  // The area as a filter term: what it keeps, and what iNaturalist can say of it. iNaturalist takes
+  // several place ids as OR, so parks that all match a place are exact.
+  function term(){var a=loaded();if(!a.length)return null;var exact=!drawn()&&a.every(function(x){return x.place;});
+    return {dim:'area',kind:drawn()?'polygon':'parks',id:hash(),label:drawn()?'Drawn area':names(a),n:a.length,
+      exclude:false,mask:function(){return api.mask(ctx.P().n);},
+      inat:function(){return exact?{params:{place_id:a.map(function(x){return x.place;}).join(',')},exact:true}:
+        {params:{},exact:false};}};}
+  var api={
+    on:function(){return loaded().length>0;},
+    // true while drawing and briefly after, so the closing tap opens no record's tip
+    busy:function(){return mode||performance.now()-ended<500;},
+    ver:function(){return VER;},
+    hash:hash,
+    term:term,
+    clear:function(){if(mode)stop();close();if(AREAS.length||NOTE||PEND)set(null);},
+    // 1 for each record inside any of the areas, null without one; extended as shards arrive.
+    mask:function(n){var I=loaded().map(function(a){return a.idx;});if(!I.length)return null;
+      if(MASK&&MASK.length===n)return MASK;
+      var pos=ctx.P().pos,m=new Uint8Array(n),i=0,j;if(MASK){m.set(MASK);i=MASK.length;}
+      for(;i<n;i++)for(j=0;j<I.length;j++)if(inside(I[j],pos[2*i],pos[2*i+1])){m[i]=1;break;}
+      MASK=m;return m;},
+    // The Identify link, through ctx.step, which steps through the batches when there are several.
+    link:function(v,url,match){var u=link(v,url,match);return ctx.step.set(ctx.sel(),LINKS,u);}
+  };
+  // What iNaturalist can filter (the parks' place_ids) goes into the link as is. Otherwise it lists
+  // the records by id, in LINKS, batches of BATCH, and offers the areas' bounding box as one link
+  // beside them. Past MAXB batches the note asks for a narrower selection, and until then the link
+  // opens the box. url(box, params) builds the link; a null box leaves it out.
+  function link(v,url,match){var t=term();LINKS=[];BOX=null;
+    if(!t||!ctx.P().n){LINK='';ui();return url(v);}
+    var P=ctx.P(),keep=ctx.keep(),S=ctx.S,day=S.up?P.up:P.obs,full=S.lo===0&&S.hi===ctx.LAST,
+      ids=[],n=0,i,d,q=t.inat(),one=t.n===1;
+    function dated(i){d=day[i];return d===65535?full:d>=S.lo&&d<=S.hi;}
+    for(i=0;i<P.n;i++){if(!keep[i]||!dated(i))continue;if(++n<=BATCH*MAXB)ids.push(P.id[i]);}
+    if(q.exact){LINK='Identify is exact: it uses the iNaturalist place'+(one?'':'s')+' for '+t.label+'. '+
+      (n===1?'1 record on this map is':nf.format(n)+' records on this map are')+' inside '+
+      (one?'its boundary.':'them.');ui();
+      return url(null,q.params);}
+    if(!n){LINK='No records inside this area match these filters.';ui();return url(v);}
+    if(n<=BATCH*MAXB){LINKS=batches(ids);var k=LINKS.length;
+      LINK='Exact: '+(k>1?nf.format(n)+' records in '+k+' batches of up to '+BATCH:n===1?'this record by id':
+        'these '+nf.format(n)+' records by id')+(n>1?', less any identified since.':'.');
+      if(k>1)BOX=boxlink(v,url,match,dated,true);ui();return LINKS[0].url;}
+    var o=boxlink(v,url,match,dated);
+    LINK=nf.format(n)+' records: too many to open exactly (limit '+nf.format(BATCH*MAXB)+'). Make the '+
+      'area smaller or add filters. Identify now opens the box around '+(drawn()?'the shape':t.label)+
+      ', about '+nf.format(o.m)+' records.';ui();
+    return o.url;}
+  // One Identify link for the areas' box, with the batches' page size and review filter. side marks
+  // the link offered beside the batches, so the button's own link is left alone.
+  function boxlink(v,url,match,dated,side){
+    var o=boxed(v,bbox(),ctx.P(),function(i){return dated(i)&&match(i);});
+    return {url:url(o.box,BOXQ,side),m:o.m};}
+  return api;
+}
+MapArea.encode=encode;MapArea.decode=decode;MapArea.fromGeoJSON=fromGeoJSON;MapArea.simplify=simplify;
+MapArea.index=index;MapArea.inside=inside;MapArea.order=order;MapArea.batches=batches;
+MapArea.boxed=boxed;MapArea.BOXQ=BOXQ;MapArea.fold=fold;MapArea.entry=entry;MapArea.match=match;
+MapArea.listing=listing;MapArea.n=0;
+return MapArea;
+})();
+
+// Projects. pool-projects.bin (see map_projects.py) lists the records in each project of
+// META.projects.list; each record gets a bitmask, bit k set when it is in project k. Each project is
+// a chip with the one click rule of map_chips.js: pick (in), leave out (not in), clear. Picked
+// projects combine with OR and left-out ones subtract. The viewer can also paste any other
+// iNaturalist project, by number or URL: an "Identify only" chip that goes into the Identify link
+// but not the map filter, as the page has no list of its records. Without the file the box stays
+// hidden and nothing is filtered. The mask is one byte, so at most 8 map projects.
+function projDecode(buf,list){
+  var u=new Uint8Array(buf),hn=new DataView(buf).getUint32(0,true),o=4+hn,
+    head=JSON.parse(new TextDecoder().decode(u.subarray(4,o))).projects,out=list.map(function(){return null;});
+  head.forEach(function(p){
+    var n=p.n,k=list.map(function(x){return x.id;}).indexOf(p.id);
+    if(o+4*n>u.length)throw new Error('project file is cut short');
+    if(k>=0){var a=new Uint32Array(n),s=0;
+      for(var i=0;i<n;i++){s=(s+(u[o+i]|u[o+n+i]<<8|u[o+2*n+i]<<16|u[o+3*n+i]<<24))>>>0;a[i]=s;}out[k]=a;}
+    o+=4*n;});
+  if(o!==u.length)throw new Error('project file size does not match its header');
+  return out;
+}
+// Sets bit k of mask[i] for records a..b-1 in lists[k]. Records arrive in shards, each sorted by id,
+// so the range is walked run by run against each sorted list.
+function projMask(id,lists,mask,a,b){
+  for(var r=a;r<b;){var e=r+1;while(e<b&&id[e]>id[e-1])e++;
+    for(var k=0;k<lists.length;k++){var L=lists[k];if(!L)continue;
+      var lo=0,hi=L.length;while(lo<hi){var m=(lo+hi)>>1;if(L[m]<id[r])lo=m+1;else hi=m;}
+      for(var i=r,j=lo;i<e&&j<L.length;i++){while(j<L.length&&L[j]<id[i])j++;if(L[j]===id[i])mask[i]|=1<<k;}}
+    r=e;}
+}
+function projKeep(m,inc,exc){return !(m&exc)&&(!inc||(m&inc)!==0);}
+// A pasted project: its number, or the number or slug in an iNaturalist project URL, as a string;
+// null for anything else. iNaturalist takes a slug wherever it takes a project number
+// (project_id=bc-rarities and project_id=90486 match the same records), so slugs pass as they are.
+var PROJ_SLUG=/^[a-z0-9][a-z0-9_-]{0,99}$/;
+function projId(t){t=String(t||'').toLowerCase();
+  return /^\d+$/.test(t)?(+t>0&&+t<=4294967295?String(+t):null):PROJ_SLUG.test(t)&&t!=='new'?t:null;}
+function projParse(s){s=String(s||'').trim();if(/^\d+$/.test(s))return projId(s);
+  var m=/^(?:https?:\/\/)?(?:[a-z]+\.)?inaturalist\.[a-z]{2,3}(?:\.[a-z]{2})?\/projects\/([^\/?#\s]+)\/?(?:[\/?#]\S*)?$/i.exec(s);
+  return m?projId(m[1]):null;}
+// The selection is a list of {id, k, st}: id a string, k the project's index in list (-1 for a
+// pasted one), st 'inc' or 'not'. In the hash each is its id, a minus for 'not' and a p before a
+// pasted one: projects=86886,p90486,-pbc-rarities. A plain number not in list, as old links carry
+// for projects the map has since dropped, reads as pasted. match=all, from when picked projects
+// could be required together, is ignored.
+function projRead(s,list){var ids=list.map(function(p){return String(p.id);}),out=[];
+  String(s||'').split(',').forEach(function(t){t=t.trim();var not=t.charAt(0)==='-';if(not)t=t.slice(1);
+    var paste=t.charAt(0)==='p',id=projId(paste?t.slice(1):t);if(!id||!paste&&!/^\d+$/.test(id))return;
+    var k=ids.indexOf(id);
+    if(!out.some(function(s){return s.id===id;}))out.push({id:id,k:k,st:not?'not':'inc'});});
+  return out;}
+function projWrite(sel){return sel.map(function(s){return (s.st==='not'?'-':'')+(s.k<0?'p':'')+s.id;}).join(',');}
+// The Identify parameters: iNaturalist ORs the ids in project_id and leaves out those in
+// not_in_project, map projects first. Exact when no pasted project is in.
+function projParams(sel){
+  var o=sel.filter(function(s){return s.k>=0;}).concat(sel.filter(function(s){return s.k<0;})),q={},
+    ids=function(st){return o.filter(function(s){return s.st===st;}).map(function(s){return s.id;});};
+  if(ids('not').length)q.not_in_project=ids('not').join(',');
+  if(ids('inc').length)q.project_id=ids('inc').join(',');
+  return {q:q,exact:!sel.some(function(s){return s.k<0;})};
+}
+function projLabel(s,list){return s.k>=0?list[s.k].title:'project '+s.id;}
+// What the note under Identify says about pasted projects, as {more, fewer}. With a map project and
+// a pasted one in, Identify opens records in either, so more than the map shows: more gives the map
+// count (shown) and the most Identify can open (alt, the records that match every other filter).
+// Otherwise any pasted project narrows what Identify opens, which the map count leaves out: fewer.
+// shown is null while the records load.
+function projNote(sel,list,shown,alt){var nf=new Intl.NumberFormat('en-CA'),
+    p=sel.filter(function(s){return s.k<0;}),pin=p.filter(function(s){return s.st==='inc';});
+  if(!p.length)return {more:'',fewer:''};
+  var names=function(a){return a.map(function(s){return (s.st==='not'?'not in ':'in ')+projLabel(s,list);}).join(', ');};
+  if(pin.length&&sel.some(function(s){return s.k>=0&&s.st==='inc';}))
+    return {fewer:'',more:'it also opens records '+names(pin)+' (Identify only), which the map cannot count'+
+      (shown!=null?', so up to '+nf.format(alt)+' rather than the '+nf.format(shown)+' on the map':'')};
+  return {more:'',fewer:'The map count does not include the Identify only project filter ('+names(p)+
+    '), so Identify opens '+(shown!=null?'at most the '+nf.format(shown)+' records shown':'fewer records than the map shows')+'.'};
+}
+function projectFilter(o){
+  var meta=o.meta,list=(meta.projects&&meta.projects.list)||[],box=document.getElementById('projbox'),
+    sel=projRead(o.hash.get('projects'),list),lists=null,mask=new Uint8Array(0),key=0,inc=0,exc=0,shown=null,alt=0;
+  function bits(){inc=exc=0;if(!lists)return;
+    sel.forEach(function(s){if(s.k>=0){if(s.st==='not')exc|=1<<s.k;else inc|=1<<s.k;}});}
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;
+    if(text!=null)e.textContent=text;return e;}
+  function find(id){for(var j=0;j<sel.length;j++)if(sel[j].id===id)return sel[j];return null;}
+  // a click steps the chip's state; cleared, it leaves the selection
+  function step(id,k){var s=find(id),v=CH.next(s&&s.st,true);
+    if(!v)sel.splice(sel.indexOf(s),1);else if(s)s.st=v;else sel.push({id:id,k:k,st:v});change();}
+  var chips,input,msg;
+  function chip(id,k,label){var b=chips.appendChild(el('button')),s=find(id),tag=k<0?' (Identify only)':'';
+    b.type='button';b.title=label+tag+'. Click to pick, again to leave out, again to clear.';
+    CH.show(b,label,s?s.st:'');b.setAttribute('aria-label',b.getAttribute('aria-label')+tag);
+    if(k<0)b.appendChild(el('span','tag','Identify only'));b.onclick=function(){step(id,k);};}
+  function draw(){chips.textContent='';
+    list.forEach(function(p,k){chip(String(p.id),k,p.title);});
+    sel.forEach(function(s){if(s.k<0)chip(s.id,-1,projLabel(s,list));});}
+  function change(){bits();key++;if(chips)draw();o.changed();}
+  function paste(){if(!input.value.trim())return;var id=projParse(input.value),k=list.map(function(p){return String(p.id);}).indexOf(id);
+    if(!id){msg.textContent='Paste a project number, like 90486, or its iNaturalist URL.';return;}
+    input.value='';if(find(id)){msg.textContent='That project is already picked.';return;}
+    msg.textContent=k>=0?list[k].title+' is on the map, so it filters the map too.':
+      'Added for Identify only; it does not change the map.';
+    sel.push({id:id,k:k,st:'inc'});change();}
+  function build(){
+    box.appendChild(el('summary',null,'Projects ')).appendChild(el('span','n')).id='nproj';
+    chips=box.appendChild(el('div','chips'));chips.setAttribute('role','group');chips.setAttribute('aria-label','Projects');
+    var f=box.appendChild(el('form','prow')),lab=f.appendChild(el('label','muted','Add another project for Identify only'));
+    input=f.appendChild(el('input','padd'));input.id=lab.htmlFor='projpaste';input.type='text';
+    input.placeholder='Project number or URL';input.autocomplete='off';input.spellcheck=false;
+    f.appendChild(el('button','padd','Add')).type='submit';
+    f.onsubmit=function(e){e.preventDefault();paste();};
+    input.addEventListener('paste',function(){setTimeout(paste,0);});
+    msg=box.appendChild(el('p','muted'));msg.setAttribute('aria-live','polite');
+    draw();box.hidden=false;
+  }
+  return {
+    load:function(get){if(!list.length||!box)return;
+      get(meta.projects.file).then(function(buf){
+        lists=projDecode(buf,list).map(function(L){return L||new Uint32Array(0);});
+        mask=new Uint8Array(0);build();bits();key++;o.changed();})
+      .catch(function(e){if(window.console)console.warn('Project filters are off: '+e.message);});},
+    sync:function(P){if(!lists||mask.length===P.n)return;var m=new Uint8Array(P.n),a=Math.min(mask.length,P.n);
+      m.set(mask.subarray(0,a));projMask(P.id,lists,m,a,P.n);mask=m;},
+    drop:function(i){return (inc|exc)!==0&&!projKeep(mask[i],inc,exc);},
+    key:function(){return key;},
+    // the records Identify can open with a pasted project in beside a map one: all but the left out
+    wide:function(){return lists&&projNote(sel,list,null,0).more?function(i){return !(mask[i]&exc);}:null;},
+    note:function(n,a){shown=n;alt=a;},
+    inexact:function(){return lists?projNote(sel,list,shown,alt).more:'';},
+    uncounted:function(){return lists?projNote(sel,list,shown,alt).fewer:'';},
+    active:function(){return (inc|exc)!==0;},
+    params:function(){return lists?projParams(sel).q:{};},
+    // the chips for the selection bar (map_chips.js), once the file has loaded
+    items:function(){return lists?sel.map(function(s){return {label:'in '+projLabel(s,list),not:s.st==='not',
+      tag:s.k<0?'Identify only':'',remove:function(){sel.splice(sel.indexOf(s),1);change();},
+      flip:function(){s.st=s.st==='not'?'inc':'not';change();}};}):[];},
+    hash:function(){return sel.length?'projects='+projWrite(sel):'';},
+    reset:function(){if(!sel.length)return;sel=[];bits();key++;if(chips)draw();}
+  };
+}
+
+// One click rule for the short-list filters (groups, show only, months) and the "your selection"
+// bar. A chip's state is '' (off), 'inc' (picked) or 'not' (left out). A click steps it '' -> 'inc'
+// -> 'not' -> '', as the taxon shortcuts do; a two-state chip skips 'not'. Within a filter the picked
+// chips combine with OR and the left-out ones subtract; filters combine with AND. In the hash a
+// filter is a list of keys, a minus marking a left-out one: groups=Insecta,-Aves.
+var CH=(function(){
+'use strict';
+var NEXT={'':'inc',inc:'not',not:''};
+function next(st,three){var n=NEXT[st||'']||'';return n==='not'&&!three?'':n;}
+// The hash value back to states over the known keys. Old links listed picked keys only, which read
+// as picked; a minus on a key in two (the two-state keys) is dropped.
+function read(s,keys,two){var out={};
+  String(s||'').split(',').forEach(function(t){t=t.trim();var not=t.charAt(0)==='-',k=not?t.slice(1):t;
+    if(keys.indexOf(k)>=0&&!(k in out)&&!(not&&two&&two.indexOf(k)>=0))out[k]=not?'not':'inc';});
+  return out;}
+function write(st,keys){return keys.filter(function(k){return st[k];}).map(function(k){
+  return (st[k]==='not'?'-':'')+encodeURIComponent(k);}).join(',');}
+function picked(st,keys,v){return keys.filter(function(k){return st[k]===v;});}
+function any(st){for(var k in st)if(st[k])return true;return false;}
+// Which groups pass, one per key. With none picked every group passes, else the picked ones, less
+// those left out. With taxa included the picked groups join the taxa as one set (see pointData in
+// map.js), so here every group passes but the left-out ones.
+function groupPass(st,keys,taxa){var some=picked(st,keys,'inc').length>0;
+  return keys.map(function(k){return st[k]!=='not'&&(taxa||!some||st[k]==='inc');});}
+// The groups in the Identify link. Without included taxa the picked groups go in as iconic_taxa,
+// which already leaves the others out. With included taxa they go in as their taxa beside them
+// (taxa). Left-out groups go in without_taxon_id (not). A group with no taxon id cannot: without
+// taxa, iconic_taxa then names every group but the left-out ones, which is exact; with taxa,
+// inc and not name the groups the link cannot add or leave out.
+function groupLink(st,keys,gid,taxa){
+  var pi=picked(st,keys,'inc'),pn=picked(st,keys,'not'),out={groups:[],taxa:[],not:[],inc:[],out:[]};
+  if(!taxa){if(pi.length){out.groups=pi;return out;}
+    if(pn.some(function(g){return !gid[g];})){out.groups=keys.filter(function(k){return st[k]!=='not';});
+      return out;}}
+  pi.forEach(function(g){if(gid[g])out.taxa.push(gid[g]);else out.inc.push(g);});
+  pn.forEach(function(g){if(gid[g])out.not.push(gid[g]);else out.out.push(g);});
+  return out;}
+// Shows a chip button's state. Picked and left out are both pressed; a left-out chip reads
+// "not <label>", in text and accessible name, in the not style the taxon and project chips share.
+function show(b,label,st){b.setAttribute('aria-pressed',String(!!st));b.classList.toggle('not',st==='not');
+  b.textContent=(st==='not'?'not ':'')+label;b.setAttribute('aria-label',(st==='not'?'Not ':'')+label);}
+// A chip in box for key k of the states object get() returns; a click steps it and calls changed.
+function chip(box,k,label,get,three,title,changed){var b=document.createElement('button');
+  b.type='button';if(title)b.title=title+'. Click to pick'+(three?', again to leave out, again to clear.':
+    ', again to clear.');
+  b.onclick=function(){var st=get(),v=next(st[k],three);if(v)st[k]=v;else delete st[k];
+    show(b,label,v);changed();};
+  show(b,label,get()[k]||'');box.appendChild(b);return b;}
+// The selection bar's chips, in the order of the filters, each with what removes it and, when its
+// filter can leave things out, what flips it between picked and left out. o: S, meta, terms (the
+// taxon terms, see TX.terms), picker (the taxon picker), pj (the project filter), months (month
+// names), only ([key, label] per status chip), two (the status keys that cannot be left out), area,
+// and redraw() after a group, month or status chip changes. A shortcut's chip also splits into its
+// taxa, one chip each, by adding its name to S.split.
+function items(o){var out=[],S=o.S,m=o.meta,two=o.two||[];
+  function add(label,not,remove,flip,split){out.push({label:label,not:not,remove:remove,flip:flip,split:split});}
+  function drop(st,k){return function(){delete st[k];o.redraw();};}
+  function turn(st,k){return function(){st[k]=st[k]==='not'?'inc':'not';o.redraw();};}
+  o.terms.forEach(function(t){var ids=[].concat(t.id);add(t.label,t.exclude,function(){
+    for(var k=S.picks.length-1;k>=0;k--)if(ids.indexOf(S.picks[k].id)>=0)S.picks.splice(k,1);
+    o.picker.changed();},function(){S.picks.forEach(function(p){if(ids.indexOf(p.id)>=0)p.not=!t.exclude;});
+    o.picker.changed();},t.kind==='preset'?{n:ids.length,go:function(){S.split.push(t.label);
+    o.picker.changed();}}:null);});
+  out=out.concat(o.pj.items());
+  m.groups.forEach(function(g){if(S.groups[g])add(m.names[g]||g,S.groups[g]==='not',drop(S.groups,g),
+    turn(S.groups,g));});
+  o.months.forEach(function(n,i){if(S.months>>i&1)add(n,false,function(){S.months&=~(1<<i);o.redraw();});});
+  o.only.forEach(function(d){if(S.only[d[0]])add(d[1],S.only[d[0]]==='not',drop(S.only,d[0]),
+    two.indexOf(d[0])<0?turn(S.only,d[0]):null);});
+  var a=o.area.term();if(a)add(a.label,false,function(){o.area.clear();});
+  return out;}
+// The selection bar, the one list of what is picked: one chip per active pick, items [{label, not,
+// tag, remove, flip, split}], each with × to remove it, and Clear all; a tag (as "Identify only")
+// shows after the label. A chip with flip is a button that flips it between picked and left out; one
+// with split ({n, go}) has a button that lists its n taxa as chips of their own. set() redraws only
+// when the items change, and keeps focus in the bar: on the flipped chip, after a split on the first
+// of its taxa, after a removal on the next × (else Clear all), or, once the bar is empty, on fallback.
+function bar(o){
+  var box=o.box,list=box.querySelector('ul'),clear=box.querySelector('button'),sig=null,want=null;
+  clear.onclick=function(){want={clear:true};o.clear();};
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;
+    if(text!=null)e.textContent=text;return e;}
+  return {set:function(items){
+    var s=items.map(function(t){return (t.not?'-':'+')+t.label+'|'+(t.tag||'');}).join('\n');
+    if(s===sig)return;sig=s;list.textContent='';
+    var xs=[],fs=[];
+    items.forEach(function(t,j){var text=(t.not?'not ':'')+t.label,li=el('li','schip'+(t.not?' not':'')),
+        x=el('button','x','×'),sp=li.appendChild(el(t.flip?'button':'span',t.flip?'sl':null,text));
+      if(t.tag)sp.appendChild(el('span','tag',t.tag));
+      if(t.flip){sp.type='button';sp.setAttribute('aria-pressed',String(!!t.not));
+        sp.title='Click to '+(t.not?'pick':'leave out')+' instead';
+        sp.onclick=function(){want={flip:j};t.flip();};}
+      if(t.split){var sb=li.appendChild(el('button','sn',t.split.n+' \u25BE'));sb.type='button';
+        sb.title='Show the '+t.split.n+' taxa one by one, to remove or leave out any of them';
+        sb.setAttribute('aria-label','Split '+text+' into its '+t.split.n+' taxa');
+        sb.onclick=function(){want={flip:j};t.split.go();};}
+      x.type='button';x.setAttribute('aria-label','Remove '+text+(t.tag?' ('+t.tag+')':''));
+      x.onclick=function(){want={x:j};t.remove();};li.appendChild(x);list.appendChild(li);
+      xs.push(x);fs.push(t.flip?sp:x);});
+    box.hidden=!items.length;
+    if(want&&want.flip!=null&&fs[want.flip])fs[want.flip].focus();
+    else if(want&&want.x!=null)(xs.length?xs[Math.min(want.x,xs.length-1)]:o.fallback).focus();
+    else if(want&&want.clear&&!items.length)o.fallback.focus();
+    want=null;}};}
+return {next:next,read:read,write:write,picked:picked,any:any,groupPass:groupPass,groupLink:groupLink,
+  show:show,chip:chip,items:items,bar:bar};
+})();
+
+/* Navigation between public exploratory pages, independent of any record queue. */
+var MapLinks=(function(){
+'use strict';
+function atlasHref(target,base,group,id){var url=new URL(target,base);
+  url.hash=new URLSearchParams({group:group,id:String(id)}).toString();return url.href;}
+function resolveRecord(ids,requested,complete){
+  for(var i=0;i<ids.length;i++)if(ids[i]===requested)return {index:i,missing:false};
+  return {index:-1,missing:!!complete};}
+return {atlasHref:atlasHref,resolveRecord:resolveRecord};
+})();
+if(typeof module!=='undefined')module.exports=MapLinks;
+
+(function(){
+'use strict';
+function $(id){return document.getElementById(id);}
+var css=getComputedStyle(document.documentElement);
+function tok(n){return css.getPropertyValue(n).trim();}
+var dark=matchMedia('(prefers-color-scheme: dark)').matches,DOT=tok('--dot').split(',').map(Number);
+var DAY=864e5,D0=Date.parse(META.day0+'T00:00:00Z'),NO=65535,NOTAX=65535,LAST=META.days-1;
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var MONTH=['January','February','March','April','May','June','July','August','September',
+  'October','November','December'];
+var FLAG={introduced:1,threatened:2,obscured:4,imprecise:8,earlyObs:16,earlyUp:32},ONLYFLAG={introduced:'introduced',
+  threatened:'threatened',exact:'obscured'},ONLYKEYS=Object.keys(ONLYFLAG),nf=new Intl.NumberFormat('en-CA');
+function iso(d){return new Date(D0+d*DAY).toISOString().slice(0,10);}
+function dayOf(s){var t=Date.parse(s+'T00:00:00Z');return isNaN(t)?null:Math.round((t-D0)/DAY);}
+function clamp(d){return Math.max(0,Math.min(LAST,d));}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+  return '&#'+c.charCodeAt(0)+';';});}
+
+// The subtitle names the build date; say how old that is, and warn once it is stale.
+var STALE_DAYS=2;
+(function(){
+  var el=$('updated'),t=el?Date.parse(el.getAttribute('datetime')+'T00:00:00Z'):NaN;
+  if(isNaN(t))return;
+  var n=new Date(),days=Math.floor((Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate())-t)/DAY),
+    before=el.previousSibling,after=el.nextSibling;
+  if(!before||!after||before.nodeType!==3||after.nodeType!==3)return;
+  if(days>STALE_DAYS){before.nodeValue='Last updated ';
+    el.textContent=days+' days ago';after.nodeValue=after.nodeValue.replace(/^\./,'; some records may have an ID by now.');}
+  else{before.nodeValue=before.nodeValue.replace(/ on $/,', updated ');
+    el.textContent=days<=0?'today':days===1?'yesterday':days+' days ago';}
+})();
+
+// Calendar lookups by day: month of year, day of month, weekday (Monday is 0) and month number
+// counted from the first day's month, which indexes META.totals.
+var MOY=new Uint8Array(META.days),DOM=new Uint8Array(META.days),DOW=new Uint8Array(META.days),
+  MI=new Uint16Array(META.days),Y0=new Date(D0).getUTCFullYear(),M0=new Date(D0).getUTCMonth();
+for(var d=0;d<META.days;d++){var t=new Date(D0+d*DAY);MOY[d]=t.getUTCMonth();DOM[d]=t.getUTCDate();
+  DOW[d]=(t.getUTCDay()+6)%7;MI[d]=(t.getUTCFullYear()-Y0)*12+MOY[d]-M0;}
+
+// What the viewer picked. Written to the URL hash so a view can be shared or bookmarked.
+// Groups and show only hold chip states (see map_chips.js): {Insecta:'inc', Aves:'not'}.
+var S={up:false,lo:0,hi:LAST,months:0,groups:{},only:{},picks:[],split:[],rec:null,at:null,fly:false};
+(function readHash(){
+  var h=new URLSearchParams(location.hash.slice(1));
+  S.up=h.get('by')==='uploaded';
+  var f=dayOf(h.get('from')||''),t=dayOf(h.get('to')||'');
+  if(f!=null)S.lo=clamp(f);if(t!=null)S.hi=clamp(t);
+  if(S.lo>S.hi){var sw=S.lo;S.lo=S.hi;S.hi=sw;}
+  (h.get('months')||'').split(',').forEach(function(m){if(+m>=1&&+m<=12)S.months|=1<<(m-1);});
+  S.groups=CH.read(h.get('groups'),META.groups);
+  S.only=CH.read(h.get('only'),ONLYKEYS.filter(function(k){return META.flags.indexOf(ONLYFLAG[k])>=0;}),['exact']);
+  S.picks=TX.read(h.get('taxa'));S.oldq=S.picks.length?'':h.get('q')||'';S.rec=+h.get('record')||null;
+  S.area=h.get('area')||'';S.park=h.get('park')||'';
+  S.bcpark=h.get('bcpark')||'';
+  var at=(h.get('at')||'').split('/').map(Number);if(at.length===3&&at.every(isFinite))S.at=at;
+  S.fly=!!S.rec&&!S.at;
+})();
+var PJ=projectFilter({meta:META,hash:new URLSearchParams(location.hash.slice(1)),changed:function(){refilter();}});
+var hashTimer=0;
+// The selection: the hash without the open record and the view.
+function sel(){
+  var h=[];if(S.up)h.push('by=uploaded');
+  if(S.lo>0)h.push('from='+iso(S.lo));if(S.hi<LAST)h.push('to='+iso(S.hi));
+  if(S.months){var ms=[];for(var m=0;m<12;m++)if(S.months>>m&1)ms.push(m+1);h.push('months='+ms);}
+  if(!allGroups())h.push('groups='+CH.write(S.groups,META.groups));
+  if(CH.any(S.only))h.push('only='+CH.write(S.only,ONLYKEYS));
+  if(S.picks.length)h.push('taxa='+TX.write(S.picks));
+  if(AREA.hash())h.push(AREA.hash());if(PJ.hash())h.push(PJ.hash());
+  return h;}
+function writeHash(){clearTimeout(hashTimer);hashTimer=setTimeout(function(){
+  var h=sel();
+  if(P.n&&SEL>=0)h.push('record='+P.id[SEL]);else if(S.rec)h.push('record='+S.rec);
+  var c=map.getCenter();h.push('at='+map.getZoom().toFixed(1)+'/'+c.lat.toFixed(3)+'/'+
+    c.lng.toFixed(3));
+  history.replaceState(null,'','#'+h.join('&'));},250);}
+
+// Records, concatenated as shards arrive.
+var P={n:0,id:new Uint32Array(0),pos:new Float32Array(0),obs:new Uint16Array(0),
+  up:new Uint16Array(0),tax:new Uint16Array(0),grp:new Uint8Array(0),ids:new Uint8Array(0),
+  fl:new Uint8Array(0)};
+var TAXA=null,TF=TX.filter(null,[]),GONE={},GONE_NEW=false,KEEP=new Uint8Array(0),SEL=-1,
+  CUM=new Float64Array(META.days+1),TOT=META.totals||null,TC=null,NODAY=0,PER=null,ALT=0;
+function cat(a,b){var c=new a.constructor(a.length+b.length);c.set(a);c.set(b,a.length);return c;}
+function unzip(buf){
+  var u=new Uint8Array(buf,0,Math.min(2,buf.byteLength));
+  if(u[0]!==0x1f||u[1]!==0x8b)return Promise.resolve(buf);
+  return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip')))
+    .arrayBuffer();
+}
+function get(url){return fetch(url).then(function(r){
+  if(!r.ok)throw new Error('HTTP '+r.status);return r.arrayBuffer();}).then(unzip);}
+// A shard stores each wider column byte by byte (every value's low byte, then the next), and ids
+// as steps from the previous id.
+function addShard(buf,n){
+  if(buf.byteLength!==17*n)throw new Error('unexpected size');
+  var b=META.bbox,sx=(b[2]-b[0])/65535,sy=(b[3]-b[1])/65535,o=0,u=new Uint8Array(buf);
+  function col(T,w){if(w===1){o+=n;return u.slice(o-n,o);}
+    var a=new T(n),v=new Uint8Array(a.buffer);
+    for(var j=0;j<w;j++,o+=n)for(var k=0;k<n;k++)v[k*w+j]=u[o+k];return a;}
+  var id=col(Uint32Array,4),qx=col(Uint16Array,2),qy=col(Uint16Array,2),obs=col(Uint16Array,2),
+    up=col(Uint16Array,2),tax=col(Uint16Array,2),grp=col(Uint8Array,1),ids=col(Uint8Array,1),
+    fl=col(Uint8Array,1),pos=new Float32Array(2*n);
+  for(var s=0,i=0;i<n;i++)id[i]=s=(s+id[i])>>>0;
+  for(i=0;i<n;i++){pos[2*i]=b[0]+qx[i]*sx;pos[2*i+1]=b[1]+qy[i]*sy;}
+  P={n:P.n+n,id:cat(P.id,id),pos:cat(P.pos,pos),obs:cat(P.obs,obs),up:cat(P.up,up),
+    tax:cat(P.tax,tax),grp:cat(P.grp,grp),ids:cat(P.ids,ids),fl:cat(P.fl,fl)};
+}
+
+// The map filters on the GPU. Each record carries its observed and uploaded day (-1 for none) as
+// filter values, and four categories: group, observed month, uploaded month (12 for no date) and a
+// status value, bit 1 introduced, 2 threatened, 4 obscured or imprecise, 8 kept by the taxon picks
+// and the area and not deleted, 16 one record in ten. Group, month, status and date changes then
+// only change the filter settings; the data is uploaded again only when records arrive, the picks,
+// the area or deletions change, or the groups change while a taxon is included (the groups and
+// included taxa are one set, so the kept bit then carries the groups too).
+var ST_INTRO=1,ST_THREAT=2,ST_INEXACT=4,ST_KEEP=8,ST_SAMPLE=16,PD=null,PD_KEY=null,PD_GONE=-1,PD_CAT=0,
+  OUT=new Uint8Array(0),RC=null,PJW=null;
+function inc(){return !!TF.inc;}
+function pointData(){
+  PJ.sync(P);
+  var n=P.n,gone=Object.keys(GONE).length,i,key=[TF,inc()?CH.picked(S.groups,META.groups,'inc').join():'',AREA.ver(),PJ.key()];
+  if(PD&&PD.length===n&&PD_KEY&&PD_KEY.every(function(k,j){return k===key[j];})&&PD_GONE===gone)return;
+  var same=PD&&PD.length===n,days=same?PD.days:new Float32Array(2*n),
+    cat=same?PD.attributes.getFilterCategory.value.slice():new Uint8Array(4*n);
+  if(!same)for(i=0;i<n;i++){var o=P.obs[i],u=P.up[i],f=P.fl[i];
+    days[2*i]=o===NO?-1:o;days[2*i+1]=u===NO?-1:u;
+    cat[4*i]=P.grp[i];cat[4*i+1]=o===NO?12:MOY[o];cat[4*i+2]=u===NO?12:MOY[u];
+    cat[4*i+3]=(f&FLAG.introduced?ST_INTRO:0)|(f&FLAG.threatened?ST_THREAT:0)|
+      (f&(FLAG.obscured|FLAG.imprecise)?ST_INEXACT:0)|(i%10===0?ST_SAMPLE:0);}
+  // only the kept bit follows the picks, the groups beside them, the area, projects and deletions
+  // OUT keeps the records out for any reason but the area, for the Identify box count; PJW marks
+  // the records Identify opens when it cannot say the projects exactly (see map_projects.js)
+  var ti=TF.inc,te=TF.exc,gs=key[1]?META.groups.map(function(g){return S.groups[g]==='inc';}):null,tax=P.tax,
+    grp=P.grp,id=P.id,nt=NOTAX,am=AREA.mask(n),wide=PJ.wide();
+  if(OUT.length!==n)OUT=new Uint8Array(n);PJW=wide?new Uint8Array(n):null;
+  for(i=0;i<n;i++){var t=tax[i],keep=!ti||(t!==nt&&ti[t]===1)||(gs!==null&&gs[grp[i]]);
+    if(te&&t!==nt&&te[t]===1||gone>0&&GONE[id[i]]===1)keep=false;
+    if(wide&&keep&&(am===null||am[i]))PJW[i]=wide(i)?1:0;if(keep&&PJ.drop(i))keep=false;
+    OUT[i]=keep?0:1;cat[4*i+3]=cat[4*i+3]&~ST_KEEP|(keep&&(am===null||am[i])?ST_KEEP:0);}
+  // a new pick, area or deletion swaps only the categories, so deck.gl uploads only those
+  if(same){PD.attributes.getFilterCategory={value:cat,size:4};PD_CAT++;}
+  else PD={length:n,days:days,attributes:{getPosition:{value:P.pos,size:2},
+    getFilterValue:{value:days,size:2},getFilterCategory:{value:cat,size:4}}};
+  PD_KEY=key;PD_GONE=gone;
+}
+function categories(thin){
+  var groups=[],mon=[],all=[],st=[],req=0,hide=0,i;
+  CH.groupPass(S.groups,META.groups,inc()).forEach(function(v,j){if(v)groups.push(j);});
+  for(i=0;i<13;i++){all.push(i);if(S.months?i<12&&S.months>>i&1:true)mon.push(i);}
+  [['introduced',ST_INTRO],['threatened',ST_THREAT],['exact',ST_INEXACT]].forEach(function(o){var v=S.only[o[0]];
+    if(v==='not'||v&&o[0]==='exact')hide|=o[1];else if(v)req|=o[1];});
+  for(i=0;i<2*ST_SAMPLE;i++)if(i&ST_KEEP&&(i&req)===req&&!(i&hide)&&(!thin||i&ST_SAMPLE))st.push(i);
+  return [groups,S.up?all:mon,S.up?mon:all,st];
+}
+// The counts behind the histograms, header and share run on the CPU after the map has redrawn.
+var CT=0;
+function refilter(){
+  pointData();layers();clearTimeout(CT);CT=setTimeout(recount,0);
+}
+function recount(){
+  var n=P.n,day=S.up?P.up:P.obs,c=categories(),gm=0,mm=0,sm=0,nd=0,cat=PD.attributes.getFilterCategory.value,
+    ch=S.up?2:1,g=CH.groupPass(S.groups,META.groups,false),m=S.months;
+  c[0].forEach(function(j){gm|=1<<j;});c[ch].forEach(function(j){mm|=1<<j;});c[3].forEach(function(j){sm|=1<<j;});
+  RC={gm:gm,mm:mm,sm:sm,ch:ch};
+  if(KEEP.length!==n)KEEP=new Uint8Array(n);
+  if(!PER)PER=new Float64Array(META.days);else PER.fill(0);
+  for(var i=0;i<n;i++){
+    var k=(gm>>cat[4*i]&1)&(mm>>cat[4*i+ch]&1)&(sm>>cat[4*i+3]&1);KEEP[i]=k;
+    if(k){var d=day[i];if(d!==NO)PER[d]++;else nd++;}
+  }
+  NODAY=nd;ALT=0;
+  if(PJW)for(i=0;i<n;i++)if(PJW[i]&&(gm>>cat[4*i]&1)&(mm>>cat[4*i+ch]&1)&(sm>>(cat[4*i+3]|ST_KEEP)&1)&&
+    (day[i]===NO?full():day[i]>=S.lo&&day[i]<=S.hi))ALT++;
+  CUM=new Float64Array(META.days+1);
+  for(var d=0;d<META.days;d++)CUM[d+1]=CUM[d]+PER[d];
+  // One picked status filter reads its own totals; two together, a left-out one, or an area, have none
+  var on=Object.keys(S.only),
+    tt=!TOT||S.picks.length||AREA.on()||PJ.active()||on.length>1||S.only[on[0]]==='not'?null:
+      on.length?TOT.only&&TOT.only[on[0]]:TOT;
+  TC=null;
+  if(tt){var rows=tt[S.up?'up':'obs'],nm=rows[0].length;TC=new Float64Array(nm+1);
+    for(var k=0;k<nm;k++){var v=0;if(!m||m>>(M0+k)%12&1)for(var j=0;j<rows.length;j++)if(g[j])v+=rows[j][k];
+      TC[k+1]=TC[k]+v;}}
+  if(SEL>=0&&!KEEP[SEL])closeCard();
+  render();
+}
+function full(){return S.lo===0&&S.hi===LAST;}
+function render(){
+  // records without a date show only over all dates, as the GPU filter does
+  var shown=CUM[S.hi+1]-CUM[S.lo]+(full()?NODAY:0);
+  $('count').textContent=P.n?nf.format(shown)+' of '+nf.format(META.n)+' records':'Loading';
+  var all=P.n&&!$('more').textContent?total(S.lo,S.hi):null;
+  $('share').textContent=all?nf.format(Math.min(shown,all))+' of '+nf.format(all)+
+    ' BC records with photos '+(full()&&!S.months&&allGroups()&&!CH.any(S.only)?
+    '':'matching these filters ')+'still need an ID ('+
+    pct(shown,all)+'). All-record counts from '+TOT.on+'.':'';
+  $('hint').textContent=TC?HINT_TOT:HINT;
+  $('from').value=iso(S.lo);$('to').value=iso(S.hi);
+  $('byObs').setAttribute('aria-pressed',String(!S.up));
+  $('byUp').setAttribute('aria-pressed',String(S.up));
+  PRESETS.forEach(function(p){var r=p.range();
+    p.el.setAttribute('aria-pressed',String(r[0]===S.lo&&r[1]===S.hi));});
+  PJ.note(P.n?shown:null,ALT);BAR.set(items());tally();draw();layers();link();writeHash();
+}
+// Whether record i matches the filters with the area left out, as recount() reads them
+function match(i){if(!RC||i>=OUT.length)return 0;var c=PD.attributes.getFilterCategory.value,s=c[4*i+3]&~ST_KEEP|(OUT[i]?0:ST_KEEP);
+  return (RC.gm>>c[4*i]&1)&(RC.mm>>c[4*i+RC.ch]&1)&(RC.sm>>s&1);}
+function link(){
+  var b=map.getBounds(),m=[],u=null;for(var i=0;i<12;i++)if(S.months>>i&1)m.push(i+1);
+  // with a taxon included, the picked groups go in as their taxa, which iNaturalist adds to the picks;
+  // left-out groups go in as taxa to leave out (see CH.groupLink)
+  var gl=CH.groupLink(S.groups,META.groups,META.group_ids||{},TF.ids.length>0),
+    taxa=gl.inc.length?null:TF.ids.concat(gl.taxa);
+  var st={groups:gl.groups,
+    all:META.groups.length,up:S.up,d1:S.lo>0?iso(S.lo):'',d2:S.hi<LAST?iso(S.hi):'',months:m,taxa:taxa,
+    not:TF.not.concat(gl.not),only:S.only};
+  // with an area on, the link may list the records by id instead, and then u stays null
+  var a=$('identify');a.href=AREA.link({w:b.getWest(),s:b.getSouth(),e:b.getEast(),n:b.getNorth()},
+    function(v,p,side){var r=TX.identifyUrl(st,v,META,Object.assign({},PJ.params(),p));if(!side)u=r;return r.url;},match);
+  a.title='Opens these records in the iNaturalist Identify page.';
+  // say when Identify cannot show the same records, and what it opens instead
+  var why=[],lost=u?u.lost:[];function gn(gs){return gs.map(gname).join(' and ');}
+  if(u&&gl.inc.length)why.push('Identify cannot add the '+gn(gl.inc)+' group to picked taxa, so it opens every taxon');
+  if(u&&gl.out.length)why.push('Identify cannot leave out the '+gn(gl.out)+' group beside picked taxa, so it keeps it');
+  if(lost.indexOf('taxa')>=0)why.push('too many taxa for one link, so it opens every taxon');
+  if(lost.indexOf('not')>=0)why.push('too many taxa left out for one link, so it keeps them');
+  if(u&&PJ.inexact())why.push(PJ.inexact());
+  var nt=$('idnote'),pf=u?PJ.uncounted():'';nt.hidden=!why.length&&!pf;nt.textContent=(why.length?'Identify shows '+
+    'more records than the map: '+why.join('; ')+'. ':'')+pf;
+}
+// The filter extension is kept between calls, as the point data is in pointData(), so deck.gl
+// uploads nothing when only the filter settings change. deck.gl would also run every category
+// through a lookup in JS and upload the result as 32-bit values; ours are already small numbers,
+// so the lookup is the identity and the bytes go up as they are.
+class Filter extends deck.DataFilterExtension{
+  static componentName='Filter';
+  initializeState(context,extension){super.initializeState(context,extension);
+    var a=this.getAttributeManager().attributes.filterCategoryValues;if(a)a.settings.transform=null;}
+  _getCategoryKey(category){return category;}
+}
+var EXT=null;
+function layers(){
+  if(!P.n||!PD)return;
+  EXT=EXT||new Filter({filterSize:2,categorySize:4});
+  var r=[full()?-1:S.lo,S.hi],any=[-1,LAST];
+  var L=[new deck.ScatterplotLayer({id:'pts',data:PD,
+    getFillColor:[DOT[0],DOT[1],DOT[2],110],radiusUnits:'pixels',getRadius:1.5,radiusMinPixels:1,
+    radiusMaxPixels:6,stroked:false,pickable:true,
+    extensions:[EXT],updateTriggers:{getFilterCategory:PD_CAT},filterRange:[S.up?any:r,S.up?r:any],filterCategories:categories(THIN)})];
+  if(SEL>=0)L.push(new deck.ScatterplotLayer({id:'sel',data:[SEL],
+    getPosition:function(i){return [P.pos[2*i],P.pos[2*i+1]];},radiusUnits:'pixels',getRadius:8,
+    filled:false,stroked:true,lineWidthUnits:'pixels',getLineWidth:2.5,
+    getLineColor:dark?[255,255,255]:[29,29,27]}));
+  overlay.setProps({layers:L,onHover:tip,onClick:pick});
+}
+
+// Two histograms. The overview has one bar per year over every date, on a log scale so that sparse
+// early years still show. The detail shows the period in view, with bars sized to it (days, weeks,
+// months or years) and scaled to its tallest bar. Picking a period in either zooms the detail to it.
+var hist=$('hist'),over=$('over'),htip=$('htip'),VIEW=[0,LAST],HE=[0,LAST+1],HU='year',drag=null;
+var OE=edges('year',0,LAST);
+function count(a,b){return CUM[b+1]-CUM[a];}
+// All records, needing an ID or Research Grade, for days a..b under the group and month filters.
+// Null when the totals are off or the days do not span whole months (the last day ends a month).
+function total(a,b){
+  if(!TC||!(a===0||DOM[a]===1)||!(b===LAST||DOM[b+1]===1))return null;
+  return TC[MI[b]+1]-TC[MI[a]];
+}
+function pct(v,t){var f=Math.min(1,v/t)*100;return (f<1&&f>0?'<1':Math.round(f))+'%';}
+function viewOf(){
+  if(S.lo===0&&S.hi===LAST)return [META.hist0,LAST];
+  var pad=Math.max(0,Math.ceil((31-(S.hi-S.lo+1))/2));
+  return [clamp(S.lo-pad),clamp(S.hi+pad)];
+}
+function unitOf(v){var n=v[1]-v[0]+1;return n<=92?'day':n<=732?'week':n<=25*366?'month':'year';}
+function edges(u,v0,v1){
+  var e=[v0];
+  for(var d=v0+1;d<=v1;d++)if(u==='day'||(u==='week'&&DOW[d]===0)||(DOM[d]===1&&
+    (u==='month'||(u==='year'&&MOY[d]===0))))e.push(d);
+  e.push(v1+1);return e;
+}
+function year(d){return iso(d).slice(0,4);}
+function dlabel(d){return DOM[d]+' '+MON[MOY[d]]+' '+year(d);}
+function binLabel(u,a){return u==='day'?dlabel(a):u==='week'?'Week of '+dlabel(a):
+  u==='month'?MONTH[MOY[a]]+' '+year(a):year(a);}
+function on(a,b){return b>=S.lo&&a<=S.hi&&(!S.months||b-a>40||!!(S.months>>MOY[a]&1)||
+  !!(S.months>>MOY[b]&1));}
+function tickLabel(u,e,k,step){
+  var a=e[k],b=e[k+1]-1;
+  if(u==='year'||u==='month')return DOM[a]===1&&MOY[a]===0&&year(a)%step===0?year(a):null;
+  if(u==='week'){if(DOM[a]!==1&&MOY[a]===MOY[b])return null;var m=DOM[a]===1?a:b;
+    return MON[MOY[m]]+(MOY[m]===0?' '+year(m):'');}
+  return [1,8,15,22].indexOf(DOM[a])>=0?DOM[a]+' '+MON[MOY[a]]:null;
+}
+// With totals, the log overview adds a line for the share of each year still needing an ID (0 at
+// the axis, 100% at the top), and the linear detail draws all records as faint bars behind. Years with
+// fewer than SHARE_MIN records in all get no point, so a lone early record cannot draw a spike.
+var SHARE_MIN=30;
+function bars(cv,e,h,log,u){
+  var w=cv.clientWidth,ax=13,r=devicePixelRatio||1,c=cv.getContext('2d'),n=e.length-1,sw=w/n;
+  cv.width=w*r;cv.height=h*r;c.setTransform(r,0,0,r,0,0);c.clearRect(0,0,w,h);
+  var v=[],tv=[],m=1,k,H=h-ax-2,bw=Math.max(sw-(sw>3?1:0),1);
+  for(k=0;k<n;k++){v.push(count(e[k],e[k+1]-1));tv.push(total(e[k],e[k+1]-1));
+    m=Math.max(m,v[k],log?0:tv[k]||0);}
+  if(!log){c.fillStyle=tok('--total');
+    for(k=0;k<n;k++)if(tv[k]){var ty=Math.max(1.5,tv[k]/m*H);
+      c.globalAlpha=on(e[k],e[k+1]-1)?1:.25;c.fillRect(k*sw,h-ax-ty,bw,ty);}}
+  c.fillStyle=tok('--bar');
+  for(k=0;k<n;k++){
+    var f=log?Math.log(1+v[k])/Math.log(1+m):v[k]/m,y=v[k]?Math.max(1.5,f*H):0;
+    c.globalAlpha=on(e[k],e[k+1]-1)?1:.25;c.fillRect(k*sw,h-ax-y,bw,y);
+  }
+  if(log){c.globalAlpha=1;c.strokeStyle=c.fillStyle=tok('--share');c.lineWidth=1.5;c.beginPath();
+    var pen=false;
+    for(k=0;k<n;k++){if(!(tv[k]>=SHARE_MIN)){pen=false;continue;}
+      var x=k*sw+bw/2,sy=h-ax-Math.min(1,v[k]/tv[k])*H;
+      if(pen)c.lineTo(x,sy);else c.moveTo(x,sy);pen=true;}
+    c.stroke();}
+  c.globalAlpha=1;c.fillStyle=tok('--muted');c.font='10px system-ui,sans-serif';c.textAlign='left';
+  var per=u==='year'?1:u==='month'?12:0,step=1,end=-1e9;
+  if(per)step=[1,2,5,10,20,25,50].find(function(s){return s*per*sw>=32;})||100;
+  for(k=0;k<n;k++){
+    var t=tickLabel(u,e,k,step),x=k*sw;if(!t)continue;
+    var tw=c.measureText(t).width;if(x<end+6||x+tw>w)continue;
+    c.fillRect(x,h-ax,1,3);c.fillText(t,x+2,h-2);end=x+tw+2;
+  }
+}
+function draw(){
+  if(!drag)VIEW=viewOf();
+  HU=unitOf(VIEW);HE=edges(HU,VIEW[0],VIEW[1]);
+  bars(over,OE,34,true,'year');bars(hist,HE,64,false,HU);
+  var cap='One bar per '+HU+', '+dlabel(VIEW[0])+' to '+dlabel(VIEW[1])+'.'+
+    (TC&&(HU==='day'||HU==='week')?' Faint all-record bars show only with bars per month or year.':'');
+  $('unit').textContent=cap;hist.setAttribute('aria-label',cap+' Drag to pick a period.');
+}
+function binAt(cv,e,x){var n=e.length-1;return Math.max(0,Math.min(n-1,Math.floor(x/(cv.clientWidth/n))));}
+function brush(cv,get){
+  var st=null;
+  cv.addEventListener('pointerdown',function(ev){cv.setPointerCapture(ev.pointerId);
+    st={x:ev.offsetX,moved:false,e:get().e};if(cv===hist)drag=st;});
+  cv.addEventListener('pointermove',function(ev){
+    var g=get(),e=st?st.e:g.e,k=binAt(cv,e,ev.offsetX);
+    var nk=count(e[k],e[k+1]-1),tk=total(e[k],e[k+1]-1);
+    htip.textContent=binLabel(g.u,e[k])+': '+nf.format(nk)+(tk?' of '+nf.format(tk)+' still need an ID ('+
+      pct(nk,tk)+')':'');
+    // Clamp by the tip's own width so it never pokes past the chart: overflow there adds a page
+    // scrollbar, which shrinks the map and shifts its view.
+    htip.hidden=false;htip.style.top=(cv.offsetTop-4)+'px';
+    var hw=htip.offsetWidth/2;
+    htip.style.left=Math.max(hw,Math.min(ev.offsetX,cv.clientWidth-hw))+'px';
+    if(!st)return;
+    if(Math.abs(ev.offsetX-st.x)>3)st.moved=true;
+    if(st.moved){var a=binAt(cv,e,Math.min(st.x,ev.offsetX)),z=binAt(cv,e,Math.max(st.x,ev.offsetX));
+      S.lo=e[a];S.hi=e[z+1]-1;render();}
+  });
+  cv.addEventListener('pointerup',function(ev){
+    if(st&&!st.moved){var k=binAt(cv,st.e,ev.offsetX);S.lo=st.e[k];S.hi=st.e[k+1]-1;}
+    st=null;drag=null;htip.hidden=true;render();});
+  cv.addEventListener('pointerleave',function(){htip.hidden=true;});
+  cv.addEventListener('dblclick',function(){S.lo=0;S.hi=LAST;render();});
+}
+brush(over,function(){return {e:OE,u:'year'};});
+brush(hist,function(){return {e:HE,u:HU};});
+
+// Controls.
+var PRESETS=[
+  ['Last 30 days',function(){return [clamp(LAST-29),LAST];}],
+  ['Last 12 months',function(){return [clamp(LAST-364),LAST];}],
+  ['This year',function(){return [clamp(dayOf(iso(LAST).slice(0,4)+'-01-01')),LAST];}],
+  ['All dates',function(){return [0,LAST];}]
+].map(function(p){var b=document.createElement('button');b.type='button';b.textContent=p[0];
+  b.onclick=function(){var r=p[1]();S.lo=r[0];S.hi=r[1];render();};$('presets').appendChild(b);
+  return {el:b,range:p[1]};});
+$('from').min=$('to').min=iso(0);$('from').max=$('to').max=iso(LAST);
+$('from').onchange=function(){var d=dayOf(this.value);if(d!=null){S.lo=clamp(d);
+  if(S.lo>S.hi)S.hi=S.lo;render();}};
+$('to').onchange=function(){var d=dayOf(this.value);if(d!=null){S.hi=clamp(d);
+  if(S.hi<S.lo)S.lo=S.hi;render();}};
+$('byObs').onclick=function(){S.up=false;refilter();};
+$('byUp').onclick=function(){S.up=true;refilter();};
+function chip(box,label,pressed,onclick,title){var b=document.createElement('button');
+  b.type='button';b.textContent=label;if(title)b.title=title;
+  b.setAttribute('aria-pressed',String(pressed));
+  b.onclick=function(){b.setAttribute('aria-pressed',String(onclick()));refilter();};
+  $(box).appendChild(b);return b;}
+// Like the months: with no group picked every group shows. A click picks a group, the next leaves it
+// out, the third clears it (see map_chips.js).
+function allGroups(){return !CH.any(S.groups);}
+function gname(g){return META.names[g]||g;}
+// a group chip shows the plain name only, "Fish" for "Fish (Actinopterygii)"; its title has both
+function gshort(g){return gname(g).replace(/ \([^)]*\)$/,'');}
+function showGroups(){GB.forEach(function(b,i){var g=META.groups[i];CH.show(b,gshort(g),S.groups[g]||'');});}
+var GB=META.groups.map(function(g){return CH.chip($('groups'),g,gshort(g),function(){return S.groups;},true,
+  gname(g),refilter);});
+$('gall').onclick=function(){S.groups={};showGroups();refilter();};
+var MB_=MON.map(function(m,i){var b=chip('months',m,!!(S.months>>i&1),
+  function(){S.months^=1<<i;return !!(S.months>>i&1);});b.setAttribute('aria-label',MONTH[i]);
+  return b;});
+function showMonths(){MB_.forEach(function(b,i){b.setAttribute('aria-pressed',String(!!(S.months>>i&1)));});}
+$('mclear').onclick=function(){S.months=0;showMonths();refilter();};
+// Introduced and threatened can be left out too. Exact location stays two-state: its opposite, hidden
+// or over 1 km uncertain, is an OR iNaturalist's Identify filters cannot say.
+var ONLYDEF=[['introduced','Introduced to BC','introduced','Species not native to BC'],
+  ['threatened','Threatened','threatened','Species with a threatened status'],
+  ['exact','Exact location','obscured','Hide records whose place is hidden or over 1 km uncertain']]
+  .filter(function(o){return META.flags.indexOf(o[2])>=0;}),
+  ONLY=ONLYDEF.map(function(o){return CH.chip($('flags'),o[0],o[1],function(){return S.only;},o[0]!=='exact',
+    o[3],refilter);});
+function showOnly(){ONLY.forEach(function(b,j){CH.show(b,ONLYDEF[j][1],S.only[ONLYDEF[j][0]]||'');});}
+if(!ONLY.length)$('flagbox').hidden=true;
+// Picked taxa: chips in the selection bar, one set with the groups. A shortcut picks, then leaves out, a set
+// of taxa, and shows only once the taxa file carries the whole tree.
+var PK=TX.picker({input:$('q'),list:$('sugg'),msg:$('qn'),picks:S.picks,ranks:META.ranks,
+  nf:nf,taxa:function(){return TAXA;},counts:function(){return TX.counts(TAXA,P.tax,P.n);},
+  onChange:function(){search();showClades();refilter();}});
+var PRE=META.presets||[],CB=PRE.map(function(c){return chip('clades',c[0],false,function(){
+  S.split=S.split.filter(function(n){return n!==c[0];});PK.cycle(c[1]);return PK.state(c[1])!=='';},c[2]);});
+$('cladebox').hidden=!CB.length;
+function showClades(){CB.forEach(function(b,k){CH.show(b,PRE[k][0],PK.state(PRE[k][1]));});}
+showClades();
+// An old link's q, names to keep, becomes picks once the taxa load. It kept those names within the
+// groups; when every name lies inside the groups the picks alone say the same, so the groups clear.
+function oldQuery(){if(!S.oldq)return;
+  var got=TX.resolve(TAXA,S.oldq,TX.counts(TAXA,P.tax,P.n)),gid=META.group_ids||{},
+    gs=CH.picked(S.groups,META.groups,'inc').filter(function(g){return gid[g];}).map(function(g){return gid[g];});
+  if(!got.length)$('q').value=S.oldq;S.oldq='';
+  got.forEach(function(p){S.picks.push(p);});
+  if(got.length&&!allGroups()&&got.every(function(p){return p.not||TX.within(TAXA,p.id,gs);}))
+    S.groups={},showGroups();
+  showClades();}
+function search(){TF=TX.filter(TAXA,S.picks);}
+// The selection bar lists every chip; its Clear all clears them, and reset also the dates.
+function redraw(){showGroups();showMonths();showOnly();refilter();}
+function clearAll(){S.months=0;S.groups={};S.only={};S.picks.length=0;S.split=[];$('q').value='';showClades();
+  search();AREA.clear();PJ.reset();redraw();}
+$('reset').onclick=function(){S.lo=0;S.hi=LAST;S.up=false;clearAll();};
+var BAR=CH.bar({box:$('selbar'),clear:clearAll,fallback:$('q')});
+function items(){return CH.items({S:S,meta:META,terms:TX.terms({T:TAXA,picks:S.picks,groups:[],meta:META,n:0,split:S.split}),
+  picker:PK,pj:PJ,months:MONTH,only:ONLYDEF,two:['exact'],area:AREA,redraw:redraw});}
+// Each folding section's summary counts its active chips, so a folded one still says what it holds.
+function tally(){var n=function(st){var c=0;for(var k in st)if(st[k])c++;return c;},m=0,i,e;
+  for(i=0;i<12;i++)m+=S.months>>i&1;
+  [['ntaxa',S.picks.length],['nonly',n(S.only)],['nproj',PJ.items().length],['ngroups',n(S.groups)],
+    ['nmonths',m]].forEach(function(d){e=$(d[0]);if(e)e.textContent=d[1]?String(d[1]):'';});}
+// Taxa and Show only start open, Groups, Projects and Months folded; a section opens as the viewer
+// last left it, and one a link filters on opens regardless (projects only know theirs once loaded).
+var FOLD='wtid-map-fold';
+(function(){var saved={};try{saved=JSON.parse(localStorage.getItem(FOLD))||{};}catch(e){}
+  var on={grpsec:CH.any(S.groups),monsec:!!S.months,flagbox:CH.any(S.only),projbox:/(^|[#&])projects=/.test(location.hash)};
+  [].forEach.call(document.querySelectorAll('details.sec'),function(d){
+    if(on[d.id])d.open=true;else if(d.id in saved)d.open=saved[d.id];
+    d.addEventListener('toggle',function(){saved[d.id]=d.open;
+      try{localStorage.setItem(FOLD,JSON.stringify(saved));}catch(e){}});});})();
+$('toggle').onclick=function(){var o=$('side').classList.toggle('open');
+  this.setAttribute('aria-expanded',String(o));};
+
+// Hover and click.
+function names(i){var t=TAXA&&P.tax[i]!==NOTAX?TAXA[P.tax[i]]:null,g=META.groups[P.grp[i]];
+  return {common:t&&t[1]||'',latin:t&&t[0]||META.names[g]||g,group:META.names[g]||g,
+    rank:t&&t[3]!==255?META.ranks[t[3]]:''};}
+function badges(i){var f=P.fl[i],out=[];
+  if(f&FLAG.introduced)out.push(['Introduced','']);if(f&FLAG.threatened)out.push(['Threatened','']);
+  if(f&FLAG.obscured)out.push(['Location hidden','warn']);
+  else if(f&FLAG.imprecise)out.push(['Location over 1 km uncertain','warn']);
+  return out.map(function(b){return '<span class="badge '+b[1]+'">'+b[0]+'</span>';}).join('');}
+function idText(i){var n=P.ids[i]&15,a=P.ids[i]>>4;
+  return n?(n>=15?'15+':n)+(n===1?' ID':' IDs')+(a?', '+(a>=15?'15+':a)+' agreeing':''):'No IDs yet';}
+function when(v,early){return v===NO?'unknown':early?'before 1900':iso(v);}
+// The hover tip sits below right of the pointer and flips to the other side of it near the window's
+// right or bottom edge. It is fixed to the window above the record card, so neither the map's
+// edges, the time bar nor an open card hide it.
+var ptip=document.createElement('div');ptip.className='ptip';ptip.hidden=true;
+function tip(o){
+  if(!P.n||o.index<0||!o.layer||o.layer.id!=='pts'||AREA.busy()){ptip.hidden=true;return;}
+  var i=o.index,t=names(i);
+  ptip.innerHTML='<b>'+esc(t.common||t.latin)+'</b>'+(t.common?'<br><i>'+esc(t.latin)+'</i>':'')+
+    '<br>'+esc(t.group)+' · observed '+when(P.obs[i],P.fl[i]&FLAG.earlyObs)+'<br>'+idText(i)+'<div class="badges">'+
+    badges(i)+'</div>';
+  ptip.hidden=false;
+  var r=map.getContainer().getBoundingClientRect(),px=r.left+o.x,py=r.top+o.y,
+    w=ptip.offsetWidth,h=ptip.offsetHeight,g=12,
+    x=px+g+w>innerWidth-4?px-g-w:px+g,y=py+g+h>innerHeight-4?py-g-h:py+g;
+  ptip.style.left=Math.max(4,x)+'px';ptip.style.top=Math.max(4,y)+'px';
+}
+var ctl=null,card=$('card');
+function pick(o){if(!P.n||o.index<0||o.layer.id!=='pts'||AREA.busy())return;openCard(o.index);}
+// A record deleted from iNaturalist leaves the map once its card closes, so the card can say why.
+// The card opens beside its point, on the side with room, and follows the point as the map moves.
+// It is fixed to the window, so the time bar and the map's edges never clip it. On a phone it is a
+// bottom sheet instead.
+var NARROW=matchMedia('(max-width:760px)');
+function place(){
+  if(SEL<0||card.hidden)return;var s=card.style;
+  if(NARROW.matches){s.left=s.top=s.right='';return;}
+  var r=map.getContainer().getBoundingClientRect(),p=map.project([P.pos[2*SEL],P.pos[2*SEL+1]]),
+    x=r.left+p.x,y=r.top+p.y,w=card.offsetWidth,h=card.offsetHeight,g=14,m=8,
+    left=x+g+w<=innerWidth-m?x+g:x-g-w>=m?x-g-w:innerWidth-m-w;
+  s.right='auto';s.left=Math.max(m,left)+'px';
+  s.top=Math.max(m,Math.min(y-h/2,innerHeight-m-h))+'px';
+}
+function closeCard(){SEL=-1;card.hidden=true;if(ctl)ctl.abort();
+  if(GONE_NEW){GONE_NEW=false;refilter();}else{layers();writeHash();}}
+function openCard(i){
+  S.rec=null;$('record-note').hidden=true;SEL=i;var t=names(i),id=P.id[i],lag=P.obs[i]!==NO&&P.up[i]!==NO&&!(P.fl[i]&(FLAG.earlyObs|FLAG.earlyUp))?P.up[i]-P.obs[i]:null;
+  card.innerHTML='<button type="button" class="x" aria-label="Close">×</button>'+
+    '<div class="ph" id="ph">Loading photo</div><div class="body">'+
+    '<h2>'+esc(t.common||t.latin)+'</h2><p class="latin"><i>'+esc(t.latin)+'</i>'+
+    (t.rank?' ('+esc(t.rank)+')':'')+'</p><div class="badges">'+badges(i)+'</div><dl>'+
+    '<dt>Group</dt><dd>'+esc(t.group)+'</dd><dt>Observed</dt><dd>'+when(P.obs[i],P.fl[i]&FLAG.earlyObs)+'</dd>'+
+    '<dt>Uploaded</dt><dd>'+when(P.up[i],P.fl[i]&FLAG.earlyUp)+(lag>0?' ('+nf.format(lag)+(lag===1?' day':' days')+
+    ' later)':'')+'</dd><dt>IDs</dt><dd>'+idText(i)+'</dd><dt>Place</dt><dd id="place">…</dd></dl>'+
+    '<div id="now"></div><a class="btn" target="_blank" rel="noopener" '+
+    'href="https://www.inaturalist.org/observations/'+id+'">Help identify on iNaturalist</a>'+
+    '<p class="attr" id="attr"></p></div>';
+  if(META.atlas_url){var sample=document.createElement('a');sample.className='btn';sample.textContent='Explore image sample';sample.href=MapLinks.atlasHref(META.atlas_url,location.href,META.groups[P.grp[i]],id);sample.target='_blank';sample.rel='noopener noreferrer';var note=document.createElement('p');note.className='attr';note.textContent='Opens a separate frozen image sample, without changing this map or its record list.';card.querySelector('.body').appendChild(sample);card.querySelector('.body').appendChild(note);}
+  card.hidden=false;card.querySelector('.x').onclick=closeCard;card.querySelector('.x').focus();
+  place();
+  layers();writeHash();
+  if(ctl)ctl.abort();ctl=new AbortController();
+  fetch('https://api.inaturalist.org/v1/observations/'+id,{signal:ctl.signal})
+    .then(function(r){if(r.status===404)return {results:[]};
+      if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(function(j){
+      var o=j.results&&j.results[0];
+      if(!o){$('ph').textContent='This record is no longer on iNaturalist, so it leaves the map';
+        $('place').textContent='';GONE[id]=1;GONE_NEW=true;return;}
+      var ph=o.photos&&o.photos[0];
+      if(ph){var img=new Image();img.alt='Photo of '+(t.common||t.latin);
+        img.onload=place;img.src=String(ph.url).replace('/square.','/medium.');$('ph').textContent='';
+        $('ph').appendChild(img);$('attr').textContent=ph.attribution||'';}
+      else $('ph').textContent='No photo on iNaturalist now';
+      $('place').textContent=o.place_guess||'Not given';
+      var now=[],ot=o.taxon||{};
+      if(o.quality_grade&&o.quality_grade!=='needs_id')now.push('Now '+
+        (o.quality_grade==='research'?'Research Grade':'casual')+', so it no longer needs an ID.');
+      if(ot.name&&ot.name!==t.latin)now.push('Now identified as '+
+        (ot.preferred_common_name?ot.preferred_common_name+' (':'')+ot.name+
+        (ot.preferred_common_name?')':'')+'.');
+      if(now.length){var p=document.createElement('p');p.className='now';p.textContent=
+        'Since this map was built: '+now.join(' ');$('now').appendChild(p);}
+      place();
+    }).catch(function(e){if(e.name==='AbortError')return;
+      $('ph').textContent='Could not load the photo';$('place').textContent='Unknown';});
+}
+addEventListener('keydown',function(e){if(e.key==='Escape'&&!card.hidden)closeCard();});
+
+// Map, then data: names and the recent shard first, older shards after.
+var b=META.bbox,opts={container:'map',style:dark?BASEMAPS.dark:BASEMAPS.light,
+  attributionControl:{compact:true}};
+if(S.at){opts.center=[S.at[2],S.at[1]];opts.zoom=S.at[0];}
+else{opts.bounds=[[b[0],b[1]],[b[2],b[3]]];opts.fitBoundsOptions={padding:20};}
+var map=new maplibregl.Map(opts);document.body.appendChild(ptip);
+map.addControl(new maplibregl.NavigationControl({showCompass:false}));
+var overlay=new deck.MapboxOverlay({interleaved:false,pickingRadius:8,layers:[]});map.addControl(overlay);
+var AREA=MapArea({map:map,S:S,LAST:LAST,hash:S.area,park:S.park,bcpark:S.bcpark,fit:!S.at,
+  place:META.place_id,parks:META.parks,get:get,P:function(){return P;},keep:function(){return KEEP;},
+  change:refilter,sel:function(){return sel().join('&');},
+  step:IdStep({a:$('identify'),prev:$('idprev'),next:$('idnext'),build:iso(LAST)})});
+// Zoomed out, blending millions of overlapping dots takes about 250 ms a frame, so while the map
+// moves it draws one record in ten, spread across BC by the id order, and all of them once it stops.
+var THIN=false,THIN_BELOW=8;
+map.on('move',function(){if(!THIN&&map.getZoom()<THIN_BELOW){THIN=true;layers();}});
+map.on('move',place);
+map.on('moveend',function(){if(THIN){THIN=false;layers();}link();writeHash();});
+map.getContainer().addEventListener('pointerleave',function(){ptip.hidden=true;});
+addEventListener('resize',function(){draw();place();});
+var HINT=$('hint').textContent,HINT_TOT='Top: records still needing an ID per year, on a log scale; the line is the '+
+  'share of all BC records with photos that still need one. Click or drag across years to zoom in. Bottom: '+
+  'the period in view, faint bars all records, solid bars those still needing an ID. Drag to pick a period, '+
+  'click a bar to zoom into it, double-click for all dates.';
+render();
+PJ.load(get);
+var names0=get(META.taxa).then(function(buf){TAXA=JSON.parse(new TextDecoder().decode(buf));
+  oldQuery();search();showClades();refilter();});
+// One shard downloads at a time, so on a slow link the recent shard gets all the bandwidth.
+var chain=Promise.resolve(),prev=Promise.resolve();
+META.shards.forEach(function(s,k){
+  var got=prev.then(function(){return get(s.file);});prev=got;
+  chain=chain.then(function(){return got;}).then(function(buf){
+    addShard(buf,s.n);
+    $('more').textContent=k<META.shards.length-1?'Loading older records…':'';
+    if(k===0)return names0;
+  }).then(function(){
+    refilter();
+    if(S.rec&&SEL<0){var requested=S.rec,resolution=MapLinks.resolveRecord(P.id,requested,k===META.shards.length-1);
+      if(resolution.index>=0){var i=resolution.index;openCard(i);
+        if(S.fly){S.fly=false;map.flyTo({center:[P.pos[2*i],P.pos[2*i+1]],zoom:12});}}
+      else if(resolution.missing){var notice=$('record-note');notice.hidden=false;notice.textContent='Requested observation '+requested+' is not in this map snapshot. No replacement has been selected. ';var original=document.createElement('a');original.href='https://www.inaturalist.org/observations/'+requested;original.textContent='View the requested observation on iNaturalist';original.target='_blank';original.rel='noopener noreferrer';notice.appendChild(original);writeHash();}}
+
+  });
+});
+chain.catch(function(e){$('count').textContent='Could not load the records ('+e.message+')';});
+})();
+</script>
+</body>
+</html>
