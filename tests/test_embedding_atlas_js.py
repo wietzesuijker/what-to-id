@@ -178,3 +178,88 @@ def test_atlas_returns_same_record_and_exact_group_to_sibling_map():
         )
         == "https://example.org/map.html#groups=Aves&record=123"
     )
+
+
+def neighborhood_payloads(expression):
+    setup = """(()=>{const ids=Array.from({length:26},(_,i)=>i+1);
+function payload(backbone,order,neighbors){return {group:'Aves',backbone,
+ records:order.map(id=>({id,name:'Photo '+id,neighbors:id===1?
+ neighbors.map(n=>[order.indexOf(n),backbone==='a'?.1:999]):[]}))};}
+const a=payload('a',ids,ids.slice(1,13));
+const b=payload('b',[...ids].reverse(),[2,3,4,5,14,15,16,17,18,19,20,21]);
+"""
+    return evaluate(setup + expression + "})()")
+
+
+def test_cross_encoder_overlap_uses_id_sets_not_indices_or_raw_scores():
+    result = neighborhood_payloads("return scope.compareNeighborhoods(a,b,1);")
+    assert result == {
+        "status": "comparable",
+        "leftCount": 12,
+        "rightCount": 12,
+        "sharedIds": [2, 3, 4, 5],
+        "cohortCount": 26,
+        "exhaustive": False,
+    }
+
+
+def test_cross_encoder_comparison_rejects_different_pools_or_groups():
+    assert neighborhood_payloads(
+        "b.records[0].id=99;return scope.compareNeighborhoods(a,b,1);"
+    ) == {"status": "pool_mismatch"}
+    assert neighborhood_payloads("b.group='Plantae';return scope.compareNeighborhoods(a,b,1);") == {
+        "status": "pool_mismatch"
+    }
+
+
+def test_cross_encoder_missing_query_and_invalid_neighbors_are_explicit():
+    assert neighborhood_payloads("return scope.compareNeighborhoods(a,b,99);") == {
+        "status": "missing_query",
+    }
+    assert neighborhood_payloads(
+        "a.records[0].neighbors=[[999,.1]];return scope.compareNeighborhoods(a,b,1);"
+    ) == {"status": "invalid_neighbors"}
+
+
+def test_cross_encoder_empty_overlap_is_valid_agreement_result():
+    assert (
+        neighborhood_payloads("""b.records.find(r=>r.id===1).neighbors=
+      Array.from({length:12},(_,i)=>[b.records.findIndex(r=>r.id===i+14),999]);
+      return scope.compareNeighborhoods(a,b,1);""")["sharedIds"]
+        == []
+    )
+
+
+def test_comparison_gate_rejects_late_selection_and_group_requests():
+    result = evaluate("""(()=>{const gate=scope.requestGate(),old=gate.begin(),next=gate.begin();
+      const before=[gate.current(old),gate.current(next)];gate.cancel();
+      return {before,after:gate.current(next),fresh:gate.current(gate.begin())};})()""")
+    assert result == {"before": [False, True], "after": False, "fresh": True}
+
+
+def test_cross_encoder_requires_full_intended_top_k_list():
+    assert neighborhood_payloads(
+        "a.records[0].neighbors=a.records[0].neighbors.slice(0,11);"
+        "return scope.compareNeighborhoods(a,b,1);"
+    ) == {"status": "invalid_neighbors"}
+    assert neighborhood_payloads(
+        "a.records[0].neighbors[1]=a.records[0].neighbors[0];"
+        "return scope.compareNeighborhoods(a,b,1);"
+    ) == {"status": "invalid_neighbors"}
+    assert neighborhood_payloads(
+        "a.records[0].neighbors[0]=[0,0];return scope.compareNeighborhoods(a,b,1);"
+    ) == {"status": "invalid_neighbors"}
+
+
+def test_cross_encoder_small_pool_overlap_is_marked_trivial():
+    result = evaluate("""scope.compareNeighborhoods(
+      {group:'Aves',backbone:'a',records:[{id:1,neighbors:[[1,.1]]},{id:2}]},
+      {group:'Aves',backbone:'b',records:[{id:2},{id:1,neighbors:[[0,999]]}]},1)""")
+    assert result["sharedIds"] == [2]
+    assert result["exhaustive"] is True
+    assert result["leftCount"] == result["rightCount"] == 1
+    assert evaluate("""scope.compareNeighborhoods(
+      {group:'Aves',backbone:'a',records:[{id:1,neighbors:[]}]},
+      {group:'Aves',backbone:'b',records:[{id:1,neighbors:[]}]},1)""") == {
+        "status": "insufficient_pool",
+    }

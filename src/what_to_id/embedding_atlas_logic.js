@@ -59,6 +59,44 @@ const AtlasScope = (() => {
     const index = records.findIndex(record => record.id === id);
     return {index: index < 0 ? 0 : index, missingRequestedId: index < 0 ? id : null};
   }
-  return {inBounds, matches, brushIndices, toggleIndex, modelHref, resolveSelection, mapHref};
+  function compareNeighborhoods(left, right, queryId) {
+    const a = left.records.find(r => r.id === queryId);
+    const b = right.records.find(r => r.id === queryId);
+    if (!a || !b) return {status: 'missing_query'};
+    const leftIds = new Set(left.records.map(r => r.id));
+    const rightIds = new Set(right.records.map(r => r.id));
+    if (left.group !== right.group || leftIds.size !== left.records.length ||
+        rightIds.size !== right.records.length || leftIds.size !== rightIds.size ||
+        [...leftIds].some(id => !rightIds.has(id))) return {status: 'pool_mismatch'};
+    if (leftIds.size < 2) return {status: 'insufficient_pool'};
+    if (left.backbone === right.backbone) return {status: 'same_encoder'};
+    function neighbors(payload, record) {
+      if (!Array.isArray(record.neighbors)) return null;
+      const k = Math.min(12, payload.records.length - 1);
+      if (record.neighbors.length < k) return null;
+      const result = [];
+      for (const entry of record.neighbors.slice(0, k)) {
+        const index = Array.isArray(entry) ? entry[0] : null;
+        if (!Number.isInteger(index) || !payload.records[index]) return null;
+        const id = payload.records[index].id;
+        if (id === queryId || result.includes(id)) return null;
+        result.push(id);
+      }
+      return result.length ? result : null;
+    }
+    const first = neighbors(left, a), second = neighbors(right, b);
+    if (!first || !second) return {status: 'invalid_neighbors'};
+    const other = new Set(second);
+    return {status: 'comparable', leftCount: first.length, rightCount: second.length,
+      sharedIds: first.filter(id => other.has(id)), cohortCount: leftIds.size,
+      exhaustive: leftIds.size <= 13};
+  }
+  function requestGate() {
+    let generation = 0;
+    return {begin: () => ++generation, cancel: () => {generation++;},
+      current: token => token === generation};
+  }
+  return {inBounds, matches, brushIndices, toggleIndex, modelHref, resolveSelection, mapHref,
+    compareNeighborhoods, requestGate};
 })();
 if (typeof module !== 'undefined') module.exports = AtlasScope;
