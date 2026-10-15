@@ -1,0 +1,125 @@
+name: embedding CPU capacity benchmark
+
+on:
+  push:
+    branches: [feat/embedding-atlas]
+    paths:
+      - .github/workflows/embedding-cpu-capacity.yml
+      - src/what_to_id/benchmark_capacity.py
+      - benchmarks/cpu_capacity_sample.csv
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: embedding-cpu-capacity
+  cancel-in-progress: false
+
+jobs:
+  checkpoint:
+    if: github.repository == 'wietzesuijker/what-to-id'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install uv==0.12.23
+          uv pip install --system --torch-backend cpu -r benchmarks/cpu-requirements.txt
+          mkdir -p capacity-results
+          lscpu > capacity-results/checkpoint-cpu.txt
+          uv pip freeze --system > capacity-results/environment.txt
+      - name: Encode first 64 and stop at a saved checkpoint
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          /usr/bin/time -v -o capacity-results/checkpoint-resources.txt \
+            python -u -m what_to_id.benchmark_capacity \
+              --pool benchmarks/cpu_capacity_sample.csv --out capacity-results/checkpoint.json \
+              --work-dir capacity-work --limit 512 --chunk-size 32 --batch 1 --threads 4 \
+              --stop-after-chunks 2
+      - name: Save checkpoint for a fresh runner
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: capacity-checkpoint-${{ github.run_id }}
+          path: |
+            capacity-work/checkpoints.json
+            capacity-work/chunk-*.npz
+            capacity-work/photos/**
+          retention-days: 1
+      - name: Preserve checkpoint measurements
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: capacity-first-${{ github.run_id }}
+          path: capacity-results/
+          retention-days: 30
+  resume:
+    needs: checkpoint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PYTHONPATH: src
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install uv==0.12.23
+          uv pip install --system --torch-backend cpu -r benchmarks/cpu-requirements.txt
+          mkdir -p capacity-results
+          lscpu > capacity-results/resume-cpu.txt
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        with:
+          name: capacity-checkpoint-${{ github.run_id }}
+          path: capacity-work
+      - name: Resume remaining photos on a fresh runner
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          /usr/bin/time -v -o capacity-results/resume-resources.txt \
+            python -u -m what_to_id.benchmark_capacity \
+              --pool benchmarks/cpu_capacity_sample.csv --out capacity-results/resume.json \
+              --work-dir capacity-work --limit 512 --chunk-size 32 --batch 1 --threads 4
+      - name: Verify a fully cached run does no encoding
+        run: |
+          /usr/bin/time -v -o capacity-results/cached-resources.txt \
+            python -u -m what_to_id.benchmark_capacity \
+              --pool benchmarks/cpu_capacity_sample.csv --out capacity-results/cached.json \
+              --work-dir capacity-work --limit 512 --chunk-size 32 --batch 1 --threads 4
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          resumed = json.loads(Path('capacity-results/resume.json').read_text())
+          cached = json.loads(Path('capacity-results/cached.json').read_text())
+          assert resumed['status'] == 'complete'
+          assert resumed['encoded_count'] == 448 and resumed['reused_count'] == 64
+          assert resumed['completed_count'] == 512
+          assert cached['status'] == 'cached'
+          assert cached['encoded_count'] == 0 and cached['reused_count'] == 512
+          assert cached['model_loaded'] is False
+          PY
+      - name: Preserve measurements and completed vector shards
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: capacity-resumed-${{ github.run_id }}
+          path: |
+            capacity-results/
+            capacity-work/checkpoints.json
+            capacity-work/chunk-*.npz
+          retention-days: 30
