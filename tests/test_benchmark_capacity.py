@@ -84,7 +84,7 @@ def test_identity_or_corruption_rejected_before_model_loading(tmp_path, monkeypa
     pool, work, calls = setup_benchmark(tmp_path, monkeypatch)
     capacity.benchmark(pool, tmp_path / "first.json", work, chunk_size=2, stop_after_chunks=1)
     if mutation == "photo":
-        next((work / "photos").iterdir()).write_text("changed bytes")
+        capacity.embed.photo_path(work, 1, "https://example.test/1.jpg").write_text("changed bytes")
     elif mutation == "shard":
         next(work.glob("chunk-*.npz")).write_bytes(b"corrupt")
     elif mutation == "pool":
