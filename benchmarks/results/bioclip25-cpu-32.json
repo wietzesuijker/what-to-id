@@ -1,0 +1,355 @@
+{
+  "run": {
+    "url": "https://github.com/wietzesuijker/what-to-id/actions/runs/38742904031",
+    "source_commit": "081afc82096d4bbe2e364530b32ab3cf58734180",
+    "runner": "ubuntu-24.04 standard public GitHub-hosted CPU",
+    "cpu": "AMD EPYC 7763, 4 logical CPUs exposed, 2 physical cores",
+    "dependency_install_seconds": 5,
+    "process_wall_seconds": 115.38,
+    "vector_artifact_sha256": "ee02b1b28636cdc8e8ef732609138be3732996dd7ce1d14b5ef05079cbab769b"
+  },
+  "measurement": {
+    "status": "complete",
+    "phase": "finished",
+    "model": {
+      "backbone": "bioclip25",
+      "revision": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+      "device": "cpu",
+      "snapshot": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+      "snapshot_bytes": 3944518364,
+      "sha256": {
+        "open_clip_config.json": "4c131846348300c77b5bee06690b0e94ee85ca9ce9a30a853b36084d00dcd25c",
+        "open_clip_model.safetensors": "ac2e37c2f89ef8e6b889176a9a3f418970ad9db15a218bd29e3321e95c46ae97"
+      }
+    },
+    "runtime": {
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "processor": "x86_64",
+      "logical_cpu_count": 4,
+      "physical_memory_bytes": 16766414848,
+      "requested_threads": 4,
+      "batch_size": 1,
+      "torch_threads": 4,
+      "torch_interop_threads": 4,
+      "versions": {
+        "torch": "2.14.1+cpu",
+        "torchvision": "0.29.1+cpu",
+        "open_clip_torch": "3.3.0",
+        "pillow": "12.3.0",
+        "numpy": "2.4.6"
+      }
+    },
+    "source_sha256": "034130aea98e2e55f5ecbc8c604dbfd882ad1083d0873a0bc9255fd097cb51bc",
+    "sample": [
+      {
+        "id": 374155068,
+        "iconic_taxon": "Actinopterygii",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/683851766/medium.jpg"
+      },
+      {
+        "id": 376372580,
+        "iconic_taxon": "Amphibia",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688144465/medium.jpg"
+      },
+      {
+        "id": 396828135,
+        "iconic_taxon": "Arachnida",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727755961/medium.jpg"
+      },
+      {
+        "id": 396804122,
+        "iconic_taxon": "Aves",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727702397/medium.jpg"
+      },
+      {
+        "id": 398818984,
+        "iconic_taxon": "Fungi",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731646719/medium.jpg"
+      },
+      {
+        "id": 398811381,
+        "iconic_taxon": "Insecta",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731627086/medium.jpg"
+      },
+      {
+        "id": 393255796,
+        "iconic_taxon": "Mammalia",
+        "photo_url": "https://static.inaturalist.org/photos/720780741/medium.jpg"
+      },
+      {
+        "id": 394445431,
+        "iconic_taxon": "Mollusca",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/723127807/medium.jpg"
+      },
+      {
+        "id": 399164261,
+        "iconic_taxon": "Plantae",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/732319358/medium.jpg"
+      },
+      {
+        "id": 374702362,
+        "iconic_taxon": "Reptilia",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684909651/medium.jpg"
+      },
+      {
+        "id": 374181405,
+        "iconic_taxon": "Actinopterygii",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/683902139/medium.jpg"
+      },
+      {
+        "id": 376377543,
+        "iconic_taxon": "Amphibia",
+        "photo_url": "https://static.inaturalist.org/photos/688155164/medium.jpg"
+      },
+      {
+        "id": 396828166,
+        "iconic_taxon": "Arachnida",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727756134/medium.jpg"
+      },
+      {
+        "id": 396804124,
+        "iconic_taxon": "Aves",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727702403/medium.jpg"
+      },
+      {
+        "id": 398822494,
+        "iconic_taxon": "Fungi",
+        "photo_url": "https://static.inaturalist.org/photos/731653883/medium.jpg"
+      },
+      {
+        "id": 398811393,
+        "iconic_taxon": "Insecta",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731627858/medium.jpg"
+      },
+      {
+        "id": 393257263,
+        "iconic_taxon": "Mammalia",
+        "photo_url": "https://static.inaturalist.org/photos/720792076/medium.jpg"
+      },
+      {
+        "id": 394451388,
+        "iconic_taxon": "Mollusca",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/723139085/medium.jpg"
+      },
+      {
+        "id": 399164428,
+        "iconic_taxon": "Plantae",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/732319418/medium.jpg"
+      },
+      {
+        "id": 374707093,
+        "iconic_taxon": "Reptilia",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684918922/medium.jpg"
+      },
+      {
+        "id": 374353340,
+        "iconic_taxon": "Actinopterygii",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684235460/medium.jpg"
+      },
+      {
+        "id": 376391722,
+        "iconic_taxon": "Amphibia",
+        "photo_url": "https://static.inaturalist.org/photos/688182821/medium.jpg"
+      },
+      {
+        "id": 396828908,
+        "iconic_taxon": "Arachnida",
+        "photo_url": "https://static.inaturalist.org/photos/727757872/medium.jpg"
+      },
+      {
+        "id": 396804128,
+        "iconic_taxon": "Aves",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727702408/medium.jpg"
+      },
+      {
+        "id": 398823579,
+        "iconic_taxon": "Fungi",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731173467/medium.jpg"
+      },
+      {
+        "id": 398811395,
+        "iconic_taxon": "Insecta",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731627871/medium.jpg"
+      },
+      {
+        "id": 393258665,
+        "iconic_taxon": "Mammalia",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/720794418/medium.jpg"
+      },
+      {
+        "id": 394452913,
+        "iconic_taxon": "Mollusca",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/723142309/medium.jpg"
+      },
+      {
+        "id": 399164454,
+        "iconic_taxon": "Plantae",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/732319509/medium.jpg"
+      },
+      {
+        "id": 374734824,
+        "iconic_taxon": "Reptilia",
+        "photo_url": "https://static.inaturalist.org/photos/684973605/medium.jpg"
+      },
+      {
+        "id": 374363487,
+        "iconic_taxon": "Actinopterygii",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684252022/medium.jpg"
+      },
+      {
+        "id": 376424587,
+        "iconic_taxon": "Amphibia",
+        "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688247717/medium.jpg"
+      }
+    ],
+    "seconds": {
+      "framework_import": 3.3964745820000033,
+      "model_download_or_cache_lookup": 12.603826103000003,
+      "model_verification": 2.7493782899999957,
+      "model_load": 11.272662944999993,
+      "photo_download": 1.2992274949999967,
+      "decode": 0.10129180000002691,
+      "preprocess": 0.11309902400000738,
+      "inference": 81.06874696600002,
+      "persist": 0.0062603289999856315,
+      "reload": 0.015860812999989093
+    },
+    "batches": [
+      {
+        "count": 1,
+        "inference_seconds": 2.539503835000005
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.505793962999988
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.4926595630000037
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5092073830000032
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5361080619999967
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5588988960000023
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5482822379999988
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5188549239999958
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5715478320000074
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5343819709999877
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.555905973999998
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5478021659999968
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5497794839999983
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5822541059999935
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.556875181999999
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5661396120000006
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.543921108999996
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5128216039999955
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.498918505000006
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.500279830000011
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.4996635520000154
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.512275152000001
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5254149900000016
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.524052138000002
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5242503759999977
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.52769960400002
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.524396564
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.525325019999997
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.543586481999995
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.5369587610000224
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.539578232999986
+      },
+      {
+        "count": 1,
+        "inference_seconds": 2.555609855
+      }
+    ],
+    "failures": [],
+    "cached_photo_count_before": 0,
+    "model_cache_existed_before": false,
+    "elapsed_seconds": 112.802684735,
+    "peak_rss_bytes": 9003425792,
+    "encoded_count": 32,
+    "vector_artifact_bytes": 122335
+  }
+}
