@@ -1,0 +1,33 @@
+{
+  "status": "stopped_by_user_scope_change",
+  "complete": false,
+  "truncated": true,
+  "sampledCount": 13400,
+  "totalMatchingKnown": 47699,
+  "pages_completed": 67,
+  "attached_photos": 27959,
+  "unique_photo_ids": 27933,
+  "unique_observation_ids": 13400,
+  "mean_photos_per_observation": 2.0864925373134326,
+  "median": 1.0,
+  "p95_nearest_rank": 6,
+  "max": 32,
+  "multiple_photo_observations": 6007,
+  "params_first_page": {
+    "place_id": 7085,
+    "quality_grade": "needs_id",
+    "photos": "true",
+    "per_page": 200,
+    "fields": "id,created_at,updated_at,photos.id,photos.url",
+    "order_by": "id",
+    "order": "desc",
+    "created_d1": "2026-10-01T00:00:00Z",
+    "created_d2": "2026-10-14T23:59:59Z"
+  },
+  "checked_at": "2026-10-15T14:08:06.034577+00:00",
+  "caveats": [
+    "Partial ID-descending nonrandom slice, biased toward high observation IDs. Not a full-pool or annual multiplicity estimate.",
+    "Current visible attachments, not historical new photo arrivals. URLs not tested for retrievability.",
+    "User selected one-primary-photo MVP; measurement stopped, old-updated cohort not started."
+  ]
+}

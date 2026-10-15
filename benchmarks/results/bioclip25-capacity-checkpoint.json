@@ -1,0 +1,406 @@
+{
+  "status": "intentionally_stopped",
+  "phase": "checkpointed",
+  "model": {
+    "backbone": "bioclip25",
+    "revision": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+    "device": "cpu",
+    "snapshot": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+    "snapshot_bytes": 3944518364,
+    "sha256": {
+      "open_clip_config.json": "4c131846348300c77b5bee06690b0e94ee85ca9ce9a30a853b36084d00dcd25c",
+      "open_clip_model.safetensors": "ac2e37c2f89ef8e6b889176a9a3f418970ad9db15a218bd29e3321e95c46ae97"
+    }
+  },
+  "runtime": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "logical_cpu_count": 4,
+    "requested_threads": 4,
+    "batch_size": 1,
+    "physical_memory_bytes": 16766414848,
+    "torch_threads": 4,
+    "torch_interop_threads": 4,
+    "versions": {
+      "torch": "2.14.1+cpu",
+      "torchvision": "0.29.1+cpu",
+      "open_clip_torch": "3.3.0",
+      "pillow": "12.3.0",
+      "numpy": "2.4.6"
+    }
+  },
+  "sample_count": 512,
+  "source_sha256": "a4373f1f538834c2576bfc75b851c4d6953aa93a86b30819623a10b550eb0c78",
+  "seconds": {
+    "checkpoint_validation": 0.0012912250000027825,
+    "framework_import": 3.3609132579999965,
+    "model_download_or_cache_lookup": 16.423509535999997,
+    "model_verification": 2.7520418910000046,
+    "model_load": 11.859639480999988,
+    "photo_download": 63.40495944300001
+  },
+  "batches": [
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.527336206000001
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.52243674799999
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.527474632999997
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.562014094999995
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5114847899999972
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5304691449999837
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5321436049999875
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.529040522999992
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5233729189999963
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5172127709999756
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5192893729999923
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5398016659999882
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5324739600000044
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5346662130000084
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5381742179999947
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.51741067399999
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.513975436999999
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.525290192
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5173928330000024
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.524612287999986
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.518443167000015
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5094190579999918
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5139565129999824
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.515162615999998
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.516032905000003
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.529704486000014
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.51814263
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.562981750000006
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.514558075000025
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5243350030000045
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5175907609999797
+    },
+    {
+      "chunk": 0,
+      "count": 1,
+      "inference_seconds": 2.5178225829999974
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5176510219999955
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.522747251999988
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.510009406999984
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5209969020000074
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5036471110000207
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.517631095000013
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5216679870000007
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5308818889999998
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.534000882000015
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5556351709999774
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.533061520000018
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.523665354000002
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.531358775000001
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5644337140000175
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.54048434799995
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.530745851000006
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.516104504999987
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.556251325000005
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.493755486999987
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.563501187999975
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5251011519999906
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.52433184399996
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.539113538000038
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5080239619999816
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5077477099999896
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5279431419999696
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.526259557000003
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5408436069999993
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5323694559999694
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5232529859999886
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.537738509999997
+    },
+    {
+      "chunk": 1,
+      "count": 1,
+      "inference_seconds": 2.5776224199999547
+    }
+  ],
+  "chunks": [
+    {
+      "index": 0,
+      "count": 32,
+      "seconds": {
+        "decode": 0.10164890699999773,
+        "preprocess": 0.11213840499988237,
+        "inference": 80.8042218359999,
+        "persist": 0.0047059530000126415
+      },
+      "elapsed_seconds": 81.083459401,
+      "artifact_bytes": 122335,
+      "peak_rss_bytes": 8925691904
+    },
+    {
+      "index": 1,
+      "count": 32,
+      "seconds": {
+        "decode": 0.08126285800008759,
+        "preprocess": 0.11201177299983556,
+        "inference": 80.95857866899979,
+        "persist": 0.0047277799999960735
+      },
+      "elapsed_seconds": 81.22568209899998,
+      "artifact_bytes": 122387,
+      "peak_rss_bytes": 8925691904
+    }
+  ],
+  "failures": [],
+  "encoded_count": 64,
+  "reused_count": 0,
+  "completed_count": 64,
+  "model_loaded": true,
+  "elapsed_seconds": 260.232805643,
+  "peak_rss_bytes": 8925691904,
+  "disk_free_bytes": 86762496000,
+  "photo_files_bytes": 93408386,
+  "run_context": {
+    "url": "https://github.com/wietzesuijker/what-to-id/actions/runs/38745033744",
+    "source_commit": "a0bb8e9",
+    "scope": "512 primary-photo fixed-queue checkpoint/recovery experiment, not production updater"
+  }
+}

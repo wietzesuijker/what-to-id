@@ -1,0 +1,336 @@
+{
+  "scope": "British Columbia needs-ID records with photos/coordinates; eligible changed-record deliveries, not photo changes",
+  "observation_start": "2026-09-30T14:30:47Z",
+  "observation_end": "2026-10-14T18:10:42Z",
+  "runs_available": 27,
+  "logs_harvested": 27,
+  "conclusions": {
+    "success": 27
+  },
+  "analysis_UTC_days": 14,
+  "analysis_start": "2026-10-01",
+  "analysis_end": "2026-10-14",
+  "analysis_runs": 23,
+  "analysis_scheduled_runs": 14,
+  "missing_scheduled_dates": [],
+  "scheduled_run_start_gap_hours": {
+    "min": 21.865833333333335,
+    "max": 27.40111111111111,
+    "mean": 23.933226495726494
+  },
+  "observed_query_overlap_hours": {
+    "min": 2.0,
+    "max": 2.0
+  },
+  "daily_metrics": {
+    "added": {
+      "total": 57064,
+      "mean_per_UTC_day": 4076,
+      "median": 3893.0,
+      "p90_linear_interpolation": 5325.4,
+      "p95_linear_interpolation": 5591.05,
+      "minimum": 2502,
+      "maximum": 6061
+    },
+    "replaced": {
+      "total": 30056,
+      "mean_per_UTC_day": 2146.8571428571427,
+      "median": 2005.0,
+      "p90_linear_interpolation": 2673.9000000000005,
+      "p95_linear_interpolation": 3039.35,
+      "minimum": 1580,
+      "maximum": 3547
+    },
+    "dropped": {
+      "total": 22193,
+      "mean_per_UTC_day": 1585.2142857142858,
+      "median": 1597.5,
+      "p90_linear_interpolation": 2083.7000000000003,
+      "p95_linear_interpolation": 2394.2,
+      "minimum": 897,
+      "maximum": 2870
+    },
+    "eligible_deliveries_upper_bound": {
+      "total": 87120,
+      "mean_per_UTC_day": 6222.857142857143,
+      "median": 6279.0,
+      "p90_linear_interpolation": 7299.2,
+      "p95_linear_interpolation": 7844.849999999999,
+      "minimum": 4786,
+      "maximum": 8827
+    },
+    "reconcile_added": {
+      "total": 170,
+      "mean_per_UTC_day": 12.142857142857142,
+      "median": 7.0,
+      "p90_linear_interpolation": 35.500000000000014,
+      "p95_linear_interpolation": 40.35,
+      "minimum": 0,
+      "maximum": 41
+    },
+    "reconcile_gone": {
+      "total": 1117,
+      "mean_per_UTC_day": 79.78571428571429,
+      "median": 61.5,
+      "p90_linear_interpolation": 155.70000000000005,
+      "p95_linear_interpolation": 204.89999999999998,
+      "minimum": 0,
+      "maximum": 279
+    },
+    "changed_or_recovered_eligible_upper_bound": {
+      "total": 87290,
+      "mean_per_UTC_day": 6235,
+      "median": 6299.5,
+      "minimum": 4790,
+      "maximum": 8831
+    },
+    "new_or_recovered_eligible_entries": {
+      "total": 57234,
+      "mean_per_UTC_day": 4088.1428571428573,
+      "median": 3916.5,
+      "minimum": 2502,
+      "maximum": 6065
+    }
+  },
+  "daily": {
+    "2026-10-01": {
+      "runs": 4,
+      "scheduled": 1,
+      "added": 6061,
+      "replaced": 2766,
+      "dropped": 1882,
+      "reconcile_added": 4,
+      "reconcile_gone": 165,
+      "eligible_deliveries_upper_bound": 8827,
+      "run_ids": [
+        36877885614,
+        36881722546,
+        36885845875,
+        36911379702
+      ],
+      "changed_or_recovered_eligible_upper_bound": 8831,
+      "new_or_recovered_eligible_entries": 6065
+    },
+    "2026-10-02": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 3946,
+      "replaced": 2459,
+      "dropped": 1786,
+      "reconcile_added": 40,
+      "reconcile_gone": 279,
+      "eligible_deliveries_upper_bound": 6405,
+      "run_ids": [
+        37049227386
+      ],
+      "changed_or_recovered_eligible_upper_bound": 6445,
+      "new_or_recovered_eligible_entries": 3986
+    },
+    "2026-10-03": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 3840,
+      "replaced": 1983,
+      "dropped": 1957,
+      "reconcile_added": 7,
+      "reconcile_gone": 19,
+      "eligible_deliveries_upper_bound": 5823,
+      "run_ids": [
+        37141197670
+      ],
+      "changed_or_recovered_eligible_upper_bound": 5830,
+      "new_or_recovered_eligible_entries": 3847
+    },
+    "2026-10-04": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 5296,
+      "replaced": 1580,
+      "dropped": 923,
+      "reconcile_added": 0,
+      "reconcile_gone": 0,
+      "eligible_deliveries_upper_bound": 6876,
+      "run_ids": [
+        37222042916
+      ],
+      "changed_or_recovered_eligible_upper_bound": 6876,
+      "new_or_recovered_eligible_entries": 5296
+    },
+    "2026-10-05": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 5338,
+      "replaced": 1922,
+      "dropped": 1607,
+      "reconcile_added": 41,
+      "reconcile_gone": 134,
+      "eligible_deliveries_upper_bound": 7260,
+      "run_ids": [
+        37374572383
+      ],
+      "changed_or_recovered_eligible_upper_bound": 7301,
+      "new_or_recovered_eligible_entries": 5379
+    },
+    "2026-10-06": {
+      "runs": 2,
+      "scheduled": 1,
+      "added": 4552,
+      "replaced": 2350,
+      "dropped": 1588,
+      "reconcile_added": 6,
+      "reconcile_gone": 70,
+      "eligible_deliveries_upper_bound": 6902,
+      "run_ids": [
+        37516375867,
+        37544154306
+      ],
+      "changed_or_recovered_eligible_upper_bound": 6908,
+      "new_or_recovered_eligible_entries": 4558
+    },
+    "2026-10-07": {
+      "runs": 6,
+      "scheduled": 1,
+      "added": 2606,
+      "replaced": 3547,
+      "dropped": 2870,
+      "reconcile_added": 1,
+      "reconcile_gone": 53,
+      "eligible_deliveries_upper_bound": 6153,
+      "run_ids": [
+        37553046748,
+        37611822565,
+        37619617551,
+        37628031555,
+        37675254733,
+        37682494989
+      ],
+      "changed_or_recovered_eligible_upper_bound": 6154,
+      "new_or_recovered_eligible_entries": 2607
+    },
+    "2026-10-08": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 3643,
+      "replaced": 1653,
+      "dropped": 1157,
+      "reconcile_added": 7,
+      "reconcile_gone": 34,
+      "eligible_deliveries_upper_bound": 5296,
+      "run_ids": [
+        37832061235
+      ],
+      "changed_or_recovered_eligible_upper_bound": 5303,
+      "new_or_recovered_eligible_entries": 3650
+    },
+    "2026-10-09": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 3308,
+      "replaced": 1755,
+      "dropped": 1092,
+      "reconcile_added": 25,
+      "reconcile_gone": 19,
+      "eligible_deliveries_upper_bound": 5063,
+      "run_ids": [
+        37977252116
+      ],
+      "changed_or_recovered_eligible_upper_bound": 5088,
+      "new_or_recovered_eligible_entries": 3333
+    },
+    "2026-10-10": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 3181,
+      "replaced": 1803,
+      "dropped": 1242,
+      "reconcile_added": 14,
+      "reconcile_gone": 32,
+      "eligible_deliveries_upper_bound": 4984,
+      "run_ids": [
+        38074115760
+      ],
+      "changed_or_recovered_eligible_upper_bound": 4998,
+      "new_or_recovered_eligible_entries": 3195
+    },
+    "2026-10-11": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 4557,
+      "replaced": 2027,
+      "dropped": 2138,
+      "reconcile_added": 12,
+      "reconcile_gone": 91,
+      "eligible_deliveries_upper_bound": 6584,
+      "run_ids": [
+        38163930797
+      ],
+      "changed_or_recovered_eligible_upper_bound": 6596,
+      "new_or_recovered_eligible_entries": 4569
+    },
+    "2026-10-12": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 5221,
+      "replaced": 2095,
+      "dropped": 1744,
+      "reconcile_added": 9,
+      "reconcile_gone": 106,
+      "eligible_deliveries_upper_bound": 7316,
+      "run_ids": [
+        38313296977
+      ],
+      "changed_or_recovered_eligible_upper_bound": 7325,
+      "new_or_recovered_eligible_entries": 5230
+    },
+    "2026-10-13": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 3013,
+      "replaced": 1773,
+      "dropped": 897,
+      "reconcile_added": 4,
+      "reconcile_gone": 87,
+      "eligible_deliveries_upper_bound": 4786,
+      "run_ids": [
+        38458940005
+      ],
+      "changed_or_recovered_eligible_upper_bound": 4790,
+      "new_or_recovered_eligible_entries": 3017
+    },
+    "2026-10-14": {
+      "runs": 1,
+      "scheduled": 1,
+      "added": 2502,
+      "replaced": 2343,
+      "dropped": 1310,
+      "reconcile_added": 0,
+      "reconcile_gone": 28,
+      "eligible_deliveries_upper_bound": 4845,
+      "run_ids": [
+        38612932839
+      ],
+      "changed_or_recovered_eligible_upper_bound": 4845,
+      "new_or_recovered_eligible_entries": 2502
+    }
+  },
+  "caveats": [
+    "Added means entering the eligible pool, including re-entry, not necessarily a new observation or uncached photo.",
+    "Replaced means eligible records fetched again, including intentional two-hour overlap, edits unrelated to photos, and manual reruns.",
+    "Daily totals include manual dispatches and overlap duplicates, so they are conservative operational deliveries, not unique daily photo changes.",
+    "All-grade fetched totals and photo URL/content deltas are not logged; eligible added+replaced bounds cache checks/new embeddings needed for this pool, not all iNaturalist records fetched.",
+    "Only current map-state release exists; overwritten pool/sync assets cannot recover historical photo URL changes.",
+    "Needs-ID pool workload does not bound adding or refreshing Research Grade reference embeddings.",
+    "Fourteen daily observations cannot establish seasonal, annual, or future peak demand.",
+    "Counters are actual logged transitions over variable query intervals, not historical updated_since API reconstructions."
+  ],
+  "recorded_warnings": [],
+  "reconcile_logs_available": 27,
+  "reconcile_logs_missing": [],
+  "releases_metadata_file": "releases.json",
+  "source_evidence": {
+    "pool_state": "src/what_to_id/pool_state.py:_cmd_sync, _cmd_reconcile",
+    "sync": "src/what_to_id/inat_sync.py:changed_since",
+    "workflow": ".github/workflows/map.yml",
+    "configured_query_overlap_hours": 2.0
+  }
+}

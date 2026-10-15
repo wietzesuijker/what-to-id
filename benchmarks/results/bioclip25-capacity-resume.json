@@ -1,0 +1,2482 @@
+{
+  "status": "complete",
+  "phase": "finished",
+  "model": {
+    "backbone": "bioclip25",
+    "revision": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+    "device": "cpu",
+    "snapshot": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+    "snapshot_bytes": 3944518364,
+    "sha256": {
+      "open_clip_config.json": "4c131846348300c77b5bee06690b0e94ee85ca9ce9a30a853b36084d00dcd25c",
+      "open_clip_model.safetensors": "ac2e37c2f89ef8e6b889176a9a3f418970ad9db15a218bd29e3321e95c46ae97"
+    }
+  },
+  "runtime": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "logical_cpu_count": 4,
+    "requested_threads": 4,
+    "batch_size": 1,
+    "physical_memory_bytes": 16766414848,
+    "torch_threads": 4,
+    "torch_interop_threads": 4,
+    "versions": {
+      "torch": "2.14.1+cpu",
+      "torchvision": "0.29.1+cpu",
+      "open_clip_torch": "3.3.0",
+      "pillow": "12.3.0",
+      "numpy": "2.4.6"
+    }
+  },
+  "sample_count": 512,
+  "source_sha256": "a4373f1f538834c2576bfc75b851c4d6953aa93a86b30819623a10b550eb0c78",
+  "seconds": {
+    "checkpoint_validation": 0.014010235000000648,
+    "framework_import": 3.380819892000005,
+    "model_download_or_cache_lookup": 26.160936352999997,
+    "model_verification": 2.3780700989999985,
+    "model_load": 9.646347340000005,
+    "photo_download": 0.01955147199998919
+  },
+  "batches": [
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2275050029999903
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.206722008
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.221268479999992
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2049805169999956
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2345876270000105
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.215677821
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2465428840000072
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.242630840000004
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2213718369999924
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.223380093000003
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2247910899999965
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2371521359999917
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2299422170000014
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.286681802000004
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.336242041999995
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.217854603999996
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.198589442999989
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.208264569000008
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.230710901000009
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.219818623000009
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2293983110000113
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.22799911300001
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2383091009999987
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2239010710000002
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.222903328000001
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2486449110000137
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2460728759999995
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2263991250000004
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2373173950000194
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.2378609399999903
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.229716185000001
+    },
+    {
+      "chunk": 2,
+      "count": 1,
+      "inference_seconds": 2.234842466999993
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2340568440000084
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2359855550000134
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.246220235999999
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2368139740000004
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2334536310000033
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.237752131999997
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2370567069999936
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2353397720000032
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2257917950000206
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.205597154000003
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.196885628999979
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.1979667129999996
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2033408789999953
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.225103328999978
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2314877930000137
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2220949049999774
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.184908139000015
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.215781340999996
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2160170809999897
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.1723714510000036
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2089489599999865
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.215018475000022
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.215236126999997
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2199516370000083
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.206600189999989
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.1957569430000206
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.196526043999995
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.1889602470000113
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2406566420000047
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2102622810000128
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2271178389999875
+    },
+    {
+      "chunk": 3,
+      "count": 1,
+      "inference_seconds": 2.2178550399999892
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.227104854999993
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.217003906000002
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.228546386000005
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.229491440000004
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2238617410000074
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.21500226400002
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.228353602999988
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2250046770000154
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2013672649999876
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2074566189999985
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2065851229999964
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.212444398999992
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2117679109999813
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.199944200999994
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2119878529999824
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2182376970000064
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2292030159999854
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.218043726000019
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.213556185000016
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2057486299999596
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2189226300000087
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.20339932600001
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2067025220000005
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.208174294999992
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2046955849999677
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.202449212000033
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2010843450000266
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.209575464000011
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2264078670000345
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.2120022259999814
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.219132016000003
+    },
+    {
+      "chunk": 4,
+      "count": 1,
+      "inference_seconds": 2.252436362000026
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.18998968599999
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.179483313999981
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.1850856359999966
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.1796076090000156
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.1877238650000095
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.197950450999997
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.191709134000007
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.1994613100000038
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2397931369999924
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.1936598679999975
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.229491939000013
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2112277950000134
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2360295689999816
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.212411486999997
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.227787843000044
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.245458668000026
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2352246320000404
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.230048986999975
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.224959130000002
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2401376849999792
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2481975970000008
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2362130200000365
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2162884740000095
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2188969489999977
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.21648273400001
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2201043379999987
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.2244631720000143
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.223132898000017
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.214905850999969
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.217248481000013
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.20088422799995
+    },
+    {
+      "chunk": 5,
+      "count": 1,
+      "inference_seconds": 2.203265971999997
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.222987735000004
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.213669388000028
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.230455414000005
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.206075228999964
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.212546187999976
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.225961245999997
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.240757538999958
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.229716725000003
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.228008410999962
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.216146803000015
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2270505740000317
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.1857355390000066
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2027239099999747
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.226851517
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.209719199999995
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2307599330000016
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.204371760000015
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.21700803899995
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.249404922999986
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2059125870000003
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.1894209160000173
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.1878735790000405
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.1984549890000267
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.1977589999999623
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2110097879999557
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2073117140000136
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2243447990000504
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2408672669999987
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.215092783999978
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2138612850000072
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.209747127000014
+    },
+    {
+      "chunk": 6,
+      "count": 1,
+      "inference_seconds": 2.2307735520000165
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.1993587119999916
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2291391150000095
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.217790478999973
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2202239020000434
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.3252498840000158
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2124065570000084
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.1875299829999904
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.1741029670000103
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.1772642899999823
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.172892945000001
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.1724956580000025
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.223545797999975
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.205549251999969
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2365276120000317
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2124929110000267
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2187365559999535
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.222483484999998
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.219415921999996
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2070308190000105
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.225655685999982
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2342920559999584
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.219445730000018
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.229757366000001
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2284792870000274
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.216280476999998
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2066804140000045
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.2013856579999924
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.1763490719999936
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.1829964539999764
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.168154515000026
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.196823096000003
+    },
+    {
+      "chunk": 7,
+      "count": 1,
+      "inference_seconds": 2.217264825999905
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.231440864000092
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2333149309999953
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.215281958999981
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.213306315000068
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2163139040000033
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.212432946999911
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.222625436000044
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.213660533999928
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.215756433000024
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2163044000000127
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.220518253000023
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.234457409000015
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2197928589999947
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.230539402999966
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.235064874999921
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2146079899999904
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2329575669999713
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.225314553999965
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2423357229999965
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2351883720000387
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2248317719999022
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.205796768999903
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2216897470000276
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.232125000999986
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.206521708000082
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.230552422999949
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.223646754000015
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.218388985000047
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2441829779999125
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.223043895000046
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.2241176070000392
+    },
+    {
+      "chunk": 8,
+      "count": 1,
+      "inference_seconds": 2.1935975209999015
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.227105534999964
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.225284444999943
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.217611627999986
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.1920691640000314
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.200108877000048
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.204271855999991
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.1967584610000586
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2066432330000225
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.227690749999965
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.23953867299997
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2494036749999395
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.236464119999937
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2337218589999566
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2255918829999928
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2355785519999927
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2183867310000096
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2073642359999894
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.224410675999934
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.228569795999988
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2336332469999434
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2336006479999924
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2387930720000213
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.231780740999966
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2257786390000547
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2467983160000813
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2382463179999377
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2246895800000175
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.2167455480000626
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.228494560999934
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.225264609999954
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.206395293000014
+    },
+    {
+      "chunk": 9,
+      "count": 1,
+      "inference_seconds": 2.213998519000029
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.1857363660000146
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.190703008000014
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.229737813999918
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.222064344000046
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2377567270000327
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.228392089999943
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.254885753999929
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2641641419999132
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2390838800000665
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.260480512000072
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2380285310000545
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2125799429999233
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.223640337000006
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2406135520000134
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.245679731999985
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2303526559999227
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.243491284000015
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.229507276999925
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.220866464999972
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.228671329000008
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2504935480000086
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.230231723999964
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.226220780999938
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.222400116000017
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2336205789999894
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2496225070000264
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2058149670000375
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.212037892000012
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.22851110900001
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2309680729999855
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.241492644999994
+    },
+    {
+      "chunk": 10,
+      "count": 1,
+      "inference_seconds": 2.2288393689999566
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2209400049999886
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.247385183000006
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.243720731000053
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.236167650000084
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2313469079999777
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2278905250000207
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.237874409000028
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2329670979999037
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2388713440000174
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2193169700000226
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.259004040000036
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2171908960000337
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2440117310000005
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2390950260000864
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.242967077000003
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.220289366999964
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2286530989999846
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2216080199999624
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.228802055000074
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.221911895000062
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2367960499999526
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2361302980000346
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2346243310000773
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2619557440000335
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2088868570000386
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2247290980000116
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.23631298600003
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.235039078
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2194021069999508
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.206719264999947
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2337784389999342
+    },
+    {
+      "chunk": 11,
+      "count": 1,
+      "inference_seconds": 2.2278234870000233
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2407875200000262
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2524599759999546
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.231053481999993
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.237710383000035
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.237259881
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2409843369999862
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2396133010000767
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.217036271999973
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2133245420000094
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.246116448999942
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2335226870000042
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.212026867000077
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2086571370000456
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.1959458239999776
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.1927119609999863
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.1975476409999146
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.202014055999939
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.199389136000036
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.199023241999953
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.1828452280000192
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.1919297949999645
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2200967909999463
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.230734775999963
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2155798840000216
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.233270016000006
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.216111088000048
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2710218340000665
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.224680669999998
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.220216300000061
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2356080560000464
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.208834742000022
+    },
+    {
+      "chunk": 12,
+      "count": 1,
+      "inference_seconds": 2.2314965349999056
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2210826489999818
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.243665266999983
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.239753847999964
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2492939090000164
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.22777472100006
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2061073309999983
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2168854089999286
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.203605016000097
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2103144669999892
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.203400710999972
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.203309697999998
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.219904438999947
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.205120050000005
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2307361760000504
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2289537020000125
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.1990073790000224
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.219123788999923
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2031776759999957
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.1841557790000934
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.194677133999903
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2030270029999883
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2105113510000365
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.1634113250000837
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.160801016999926
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.1667280469999923
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.1719490020000194
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.1854301890000443
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2283134409999548
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2493770260000474
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.252106002000005
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2562647559999505
+    },
+    {
+      "chunk": 13,
+      "count": 1,
+      "inference_seconds": 2.2815569709999863
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.235864950000064
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2536327419999225
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2555043170000317
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2412866429999667
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2363260199999786
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.236428249000028
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2383126419999826
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.239291802000025
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.221814694000045
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2284067180000875
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2328418239999337
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2246973440001057
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.233489865000024
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.221144271000071
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.247428764999995
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.245748646000038
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2453091040000572
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.243019365000009
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2529083379999975
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.249984769999969
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2539144410000063
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.235557503999985
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.242920519999984
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2370913629999905
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2563287870000295
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.268751349000013
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2491524440000603
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.274243738999985
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2650519709999344
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.259433594000029
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2684757279999985
+    },
+    {
+      "chunk": 14,
+      "count": 1,
+      "inference_seconds": 2.2579093709999825
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2349176420000276
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.233811926000044
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2330510220000406
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2125170639999396
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.233971732999862
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.204934860000094
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.221738039999991
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.203602819000025
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2358323029998246
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.276114667999991
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2739803639999536
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.25806088499985
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.216741989999946
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.260611585000106
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.231269255999905
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.285515847999932
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.251730347000148
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2834696410000106
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2494828819999384
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2345200350000596
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.276415274999863
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2360832550000396
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.259120363999955
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2553807630001756
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.232218661999923
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2037678739998228
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2443004419999397
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.213055897000004
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.221899687000132
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.2372774939999545
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.241243046000136
+    },
+    {
+      "chunk": 15,
+      "count": 1,
+      "inference_seconds": 2.233824592000019
+    }
+  ],
+  "chunks": [
+    {
+      "index": 2,
+      "count": 32,
+      "seconds": {
+        "decode": 0.08164337900007013,
+        "preprocess": 0.09820091000000275,
+        "inference": 71.43807936000003,
+        "persist": 0.0041345489999855545
+      },
+      "elapsed_seconds": 71.69001881000001,
+      "artifact_bytes": 122330,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 3,
+      "count": 32,
+      "seconds": {
+        "decode": 0.07138456700002394,
+        "preprocess": 0.09692491700002392,
+        "inference": 70.93691548500001,
+        "persist": 0.0041704619999904935
+      },
+      "elapsed_seconds": 71.179991658,
+      "artifact_bytes": 122439,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 4,
+      "count": 32,
+      "seconds": {
+        "decode": 0.06825080400017214,
+        "preprocess": 0.09691506400011463,
+        "inference": 70.89569334700005,
+        "persist": 0.004213536999998269
+      },
+      "elapsed_seconds": 71.14005600899998,
+      "artifact_bytes": 122369,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 5,
+      "count": 32,
+      "seconds": {
+        "decode": 0.07266210099993486,
+        "preprocess": 0.0978315940000698,
+        "inference": 70.87732545900008,
+        "persist": 0.004110851999996612
+      },
+      "elapsed_seconds": 71.28758634999997,
+      "artifact_bytes": 122341,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 6,
+      "count": 32,
+      "seconds": {
+        "decode": 0.08052735800015398,
+        "preprocess": 0.09627620700001671,
+        "inference": 70.91237945999995,
+        "persist": 0.004068368999980976
+      },
+      "elapsed_seconds": 71.189593339,
+      "artifact_bytes": 122397,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 7,
+      "count": 32,
+      "seconds": {
+        "decode": 0.07801525499991158,
+        "preprocess": 0.09635677199997872,
+        "inference": 70.73780148399987,
+        "persist": 0.004101517999970383
+      },
+      "elapsed_seconds": 71.24832434400003,
+      "artifact_bytes": 122375,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 8,
+      "count": 32,
+      "seconds": {
+        "decode": 0.07475556700023844,
+        "preprocess": 0.09720576700021866,
+        "inference": 71.12970988799975,
+        "persist": 0.004185735000078239
+      },
+      "elapsed_seconds": 71.46683812600008,
+      "artifact_bytes": 122391,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 9,
+      "count": 32,
+      "seconds": {
+        "decode": 0.07289591900007508,
+        "preprocess": 0.09661761799975466,
+        "inference": 71.16079324199973,
+        "persist": 0.00435262700000294
+      },
+      "elapsed_seconds": 71.607392677,
+      "artifact_bytes": 122350,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 10,
+      "count": 32,
+      "seconds": {
+        "decode": 0.0737541839999949,
+        "preprocess": 0.09652862799975992,
+        "inference": 71.38668905299971,
+        "persist": 0.004113280000069608
+      },
+      "elapsed_seconds": 71.70528101500008,
+      "artifact_bytes": 122303,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 11,
+      "count": 32,
+      "seconds": {
+        "decode": 0.07143051499997455,
+        "preprocess": 0.09619436299999506,
+        "inference": 71.42221176900034,
+        "persist": 0.0042125859999941895
+      },
+      "elapsed_seconds": 71.744671735,
+      "artifact_bytes": 122308,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 12,
+      "count": 32,
+      "seconds": {
+        "decode": 0.06846071199993276,
+        "preprocess": 0.09578508699996746,
+        "inference": 71.079610409,
+        "persist": 0.004116452000062054
+      },
+      "elapsed_seconds": 71.427510009,
+      "artifact_bytes": 122369,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 13,
+      "count": 32,
+      "seconds": {
+        "decode": 0.07334445300023162,
+        "preprocess": 0.0953106030001436,
+        "inference": 70.83952527999998,
+        "persist": 0.004084221999960391
+      },
+      "elapsed_seconds": 71.20438988800004,
+      "artifact_bytes": 122359,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 14,
+      "count": 32,
+      "seconds": {
+        "decode": 0.06085311399976945,
+        "preprocess": 0.09555877199977658,
+        "inference": 71.85227188000033,
+        "persist": 0.0041154099999403115
+      },
+      "elapsed_seconds": 72.35901661999992,
+      "artifact_bytes": 122433,
+      "peak_rss_bytes": 8946626560
+    },
+    {
+      "index": 15,
+      "count": 32,
+      "seconds": {
+        "decode": 0.09314239100035593,
+        "preprocess": 0.09352469900034066,
+        "inference": 71.69046226099965,
+        "persist": 0.00414828399993894
+      },
+      "elapsed_seconds": 72.26043974300012,
+      "artifact_bytes": 122352,
+      "peak_rss_bytes": 8946626560
+    }
+  ],
+  "failures": [],
+  "encoded_count": 448,
+  "reused_count": 64,
+  "completed_count": 512,
+  "model_loaded": true,
+  "elapsed_seconds": 1043.1884903910002,
+  "peak_rss_bytes": 8946626560,
+  "disk_free_bytes": 86031659008,
+  "photo_files_bytes": 82286126,
+  "run_context": {
+    "url": "https://github.com/wietzesuijker/what-to-id/actions/runs/38745033744",
+    "source_commit": "a0bb8e9",
+    "scope": "512 primary-photo fixed-queue checkpoint/recovery experiment, not production updater"
+  }
+}

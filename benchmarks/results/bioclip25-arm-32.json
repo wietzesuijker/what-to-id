@@ -1,0 +1,349 @@
+{
+  "status": "complete",
+  "phase": "finished",
+  "model": {
+    "backbone": "bioclip25",
+    "revision": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+    "device": "cpu",
+    "snapshot": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+    "snapshot_bytes": 3944518364,
+    "sha256": {
+      "open_clip_config.json": "4c131846348300c77b5bee06690b0e94ee85ca9ce9a30a853b36084d00dcd25c",
+      "open_clip_model.safetensors": "ac2e37c2f89ef8e6b889176a9a3f418970ad9db15a218bd29e3321e95c46ae97"
+    }
+  },
+  "runtime": {
+    "platform": "Linux-6.17.0-1022-azure-aarch64-with-glibc2.39",
+    "processor": "aarch64",
+    "logical_cpu_count": 4,
+    "physical_memory_bytes": 16722010112,
+    "requested_threads": 4,
+    "batch_size": 1,
+    "torch_threads": 4,
+    "torch_interop_threads": 4,
+    "versions": {
+      "torch": "2.14.1+cpu",
+      "torchvision": "0.29.1+cpu",
+      "open_clip_torch": "3.3.0",
+      "pillow": "12.3.0",
+      "numpy": "2.4.6"
+    }
+  },
+  "source_sha256": "034130aea98e2e55f5ecbc8c604dbfd882ad1083d0873a0bc9255fd097cb51bc",
+  "sample": [
+    {
+      "id": 374155068,
+      "iconic_taxon": "Actinopterygii",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/683851766/medium.jpg"
+    },
+    {
+      "id": 376372580,
+      "iconic_taxon": "Amphibia",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688144465/medium.jpg"
+    },
+    {
+      "id": 396828135,
+      "iconic_taxon": "Arachnida",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727755961/medium.jpg"
+    },
+    {
+      "id": 396804122,
+      "iconic_taxon": "Aves",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727702397/medium.jpg"
+    },
+    {
+      "id": 398818984,
+      "iconic_taxon": "Fungi",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731646719/medium.jpg"
+    },
+    {
+      "id": 398811381,
+      "iconic_taxon": "Insecta",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731627086/medium.jpg"
+    },
+    {
+      "id": 393255796,
+      "iconic_taxon": "Mammalia",
+      "photo_url": "https://static.inaturalist.org/photos/720780741/medium.jpg"
+    },
+    {
+      "id": 394445431,
+      "iconic_taxon": "Mollusca",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/723127807/medium.jpg"
+    },
+    {
+      "id": 399164261,
+      "iconic_taxon": "Plantae",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/732319358/medium.jpg"
+    },
+    {
+      "id": 374702362,
+      "iconic_taxon": "Reptilia",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684909651/medium.jpg"
+    },
+    {
+      "id": 374181405,
+      "iconic_taxon": "Actinopterygii",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/683902139/medium.jpg"
+    },
+    {
+      "id": 376377543,
+      "iconic_taxon": "Amphibia",
+      "photo_url": "https://static.inaturalist.org/photos/688155164/medium.jpg"
+    },
+    {
+      "id": 396828166,
+      "iconic_taxon": "Arachnida",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727756134/medium.jpg"
+    },
+    {
+      "id": 396804124,
+      "iconic_taxon": "Aves",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727702403/medium.jpg"
+    },
+    {
+      "id": 398822494,
+      "iconic_taxon": "Fungi",
+      "photo_url": "https://static.inaturalist.org/photos/731653883/medium.jpg"
+    },
+    {
+      "id": 398811393,
+      "iconic_taxon": "Insecta",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731627858/medium.jpg"
+    },
+    {
+      "id": 393257263,
+      "iconic_taxon": "Mammalia",
+      "photo_url": "https://static.inaturalist.org/photos/720792076/medium.jpg"
+    },
+    {
+      "id": 394451388,
+      "iconic_taxon": "Mollusca",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/723139085/medium.jpg"
+    },
+    {
+      "id": 399164428,
+      "iconic_taxon": "Plantae",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/732319418/medium.jpg"
+    },
+    {
+      "id": 374707093,
+      "iconic_taxon": "Reptilia",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684918922/medium.jpg"
+    },
+    {
+      "id": 374353340,
+      "iconic_taxon": "Actinopterygii",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684235460/medium.jpg"
+    },
+    {
+      "id": 376391722,
+      "iconic_taxon": "Amphibia",
+      "photo_url": "https://static.inaturalist.org/photos/688182821/medium.jpg"
+    },
+    {
+      "id": 396828908,
+      "iconic_taxon": "Arachnida",
+      "photo_url": "https://static.inaturalist.org/photos/727757872/medium.jpg"
+    },
+    {
+      "id": 396804128,
+      "iconic_taxon": "Aves",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/727702408/medium.jpg"
+    },
+    {
+      "id": 398823579,
+      "iconic_taxon": "Fungi",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731173467/medium.jpg"
+    },
+    {
+      "id": 398811395,
+      "iconic_taxon": "Insecta",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/731627871/medium.jpg"
+    },
+    {
+      "id": 393258665,
+      "iconic_taxon": "Mammalia",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/720794418/medium.jpg"
+    },
+    {
+      "id": 394452913,
+      "iconic_taxon": "Mollusca",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/723142309/medium.jpg"
+    },
+    {
+      "id": 399164454,
+      "iconic_taxon": "Plantae",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/732319509/medium.jpg"
+    },
+    {
+      "id": 374734824,
+      "iconic_taxon": "Reptilia",
+      "photo_url": "https://static.inaturalist.org/photos/684973605/medium.jpg"
+    },
+    {
+      "id": 374363487,
+      "iconic_taxon": "Actinopterygii",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/684252022/medium.jpg"
+    },
+    {
+      "id": 376424587,
+      "iconic_taxon": "Amphibia",
+      "photo_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688247717/medium.jpg"
+    }
+  ],
+  "seconds": {
+    "framework_import": 2.148740683999989,
+    "model_download_or_cache_lookup": 22.216708732,
+    "model_verification": 2.206285783999988,
+    "model_load": 9.052599049999998,
+    "photo_download": 2.6258468860000335,
+    "decode": 0.07369275000013431,
+    "preprocess": 0.04921616800015727,
+    "inference": 59.883541578000234,
+    "persist": 0.004274053000017375,
+    "reload": 0.009717828999953326
+  },
+  "batches": [
+    {
+      "count": 1,
+      "inference_seconds": 1.8775003659999925
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8591343750000533
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.862689157000034
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8595466579999993
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8571330850000436
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.864492293000012
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8798260750000395
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8708582429999865
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8617519410000227
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.859463398999992
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8566032860000519
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8698024029999942
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8831743449999863
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8577093760000025
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8796409430000267
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.860955582000031
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8545430359999955
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8555288619999715
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.857668571999966
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8525547620000111
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8526986379999926
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8547901759999945
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8621343620000061
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8855844999999931
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.9323072720000027
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.9603645550000124
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.951117221000004
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8702648880000083
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8719273500000213
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.855027490999987
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8540264179999895
+    },
+    {
+      "count": 1,
+      "inference_seconds": 1.8527219480000099
+    }
+  ],
+  "failures": [],
+  "cached_photo_count_before": 0,
+  "model_cache_existed_before": false,
+  "elapsed_seconds": 98.32673692999998,
+  "peak_rss_bytes": 9089241088,
+  "encoded_count": 32,
+  "vector_artifact_bytes": 122344,
+  "run_context": {
+    "url": "https://github.com/wietzesuijker/what-to-id/actions/runs/38749354943",
+    "source_commit": "199667f",
+    "scope": "32-photo ARM smoke, not sustained daily capacity"
+  }
+}

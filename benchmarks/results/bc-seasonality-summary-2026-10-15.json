@@ -1,0 +1,129 @@
+{
+  "interpretation": "Retrospective seasonal planning envelope of currently visible photo observations by UTC creation day. Current quality/photo state and deletion bias; not observed historical arrivals, eligible changes, new photo attachments to old observations, or reference-refresh work.",
+  "start_UTC": "2025-10-15T00:00:00Z",
+  "end_UTC": "2026-10-14T23:59:59Z",
+  "official_parameters_source": "https://api.inaturalist.org/v1/swagger.json",
+  "boundary_validation": "Date-only created_d2 included an extra day; corrected using explicit UTC date-times. created_on uses a different day boundary, so count checks also use explicit UTC times.",
+  "allgrades": {
+    "days": 365,
+    "total": 1667618,
+    "mean_per_day": 4568.816438356164,
+    "median": 4517,
+    "p95_linear_interpolation": 8120.200000000001,
+    "maximum": 13462,
+    "peak_UTC_day": "2026-04-26",
+    "largest_7day_sum": 70776,
+    "largest_7day_start": "2026-04-24",
+    "largest_7day_end": "2026-04-30",
+    "largest_7day_mean": 10110.857142857143,
+    "top10days": [
+      [
+        "2026-04-26",
+        13462
+      ],
+      [
+        "2026-04-27",
+        12230
+      ],
+      [
+        "2026-04-25",
+        11790
+      ],
+      [
+        "2026-04-29",
+        10603
+      ],
+      [
+        "2026-05-10",
+        10315
+      ],
+      [
+        "2026-04-28",
+        9435
+      ],
+      [
+        "2026-05-23",
+        9283
+      ],
+      [
+        "2026-07-26",
+        9245
+      ],
+      [
+        "2026-05-31",
+        8727
+      ],
+      [
+        "2026-05-18",
+        8677
+      ]
+    ]
+  },
+  "needsid": {
+    "days": 365,
+    "total": 830194,
+    "mean_per_day": 2274.504109589041,
+    "median": 2139,
+    "p95_linear_interpolation": 4222.2,
+    "maximum": 5707,
+    "peak_UTC_day": "2026-04-26",
+    "largest_7day_sum": 30366,
+    "largest_7day_start": "2026-04-24",
+    "largest_7day_end": "2026-04-30",
+    "largest_7day_mean": 4338.0,
+    "top10days": [
+      [
+        "2026-04-26",
+        5707
+      ],
+      [
+        "2026-05-10",
+        5211
+      ],
+      [
+        "2026-07-26",
+        5206
+      ],
+      [
+        "2026-04-27",
+        5137
+      ],
+      [
+        "2026-04-25",
+        5018
+      ],
+      [
+        "2026-09-19",
+        4778
+      ],
+      [
+        "2026-05-23",
+        4725
+      ],
+      [
+        "2026-09-28",
+        4717
+      ],
+      [
+        "2026-04-29",
+        4593
+      ],
+      [
+        "2026-07-25",
+        4499
+      ]
+    ]
+  },
+  "validation_peak": {
+    "UTC_day": "2026-04-26",
+    "count_query_total": 13462,
+    "histogram_bucket": 13462,
+    "equal": true
+  },
+  "validation_last": {
+    "UTC_day": "2026-10-14",
+    "count_query_total": 4125,
+    "histogram_bucket": 4125,
+    "equal": true
+  }
+}

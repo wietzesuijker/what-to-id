@@ -1,0 +1,37 @@
+{
+  "status": "cached",
+  "phase": "finished",
+  "model": {
+    "backbone": "bioclip25",
+    "revision": "6e3d04e3d6522012c88181085c5ae666e14c45cd",
+    "device": "cpu"
+  },
+  "runtime": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "logical_cpu_count": 4,
+    "requested_threads": 4,
+    "batch_size": 1,
+    "physical_memory_bytes": 16766414848
+  },
+  "sample_count": 512,
+  "source_sha256": "a4373f1f538834c2576bfc75b851c4d6953aa93a86b30819623a10b550eb0c78",
+  "seconds": {
+    "checkpoint_validation": 0.10291093099999671
+  },
+  "batches": [],
+  "chunks": [],
+  "failures": [],
+  "encoded_count": 0,
+  "reused_count": 512,
+  "completed_count": 512,
+  "model_loaded": false,
+  "elapsed_seconds": 0.10319570000001477,
+  "peak_rss_bytes": 142225408,
+  "disk_free_bytes": 86031618048,
+  "run_context": {
+    "url": "https://github.com/wietzesuijker/what-to-id/actions/runs/38745033744",
+    "source_commit": "a0bb8e9",
+    "scope": "512 primary-photo fixed-queue checkpoint/recovery experiment, not production updater"
+  }
+}

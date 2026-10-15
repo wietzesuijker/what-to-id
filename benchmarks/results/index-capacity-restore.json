@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "transfer_source": "GitHub release asset, separate fresh runner",
+  "rows": 3068634,
+  "dimensions": 1024,
+  "index_bytes": 815370628,
+  "load_seconds": 0.4306509489999968,
+  "search_512_seconds": 4.3823400400000025,
+  "peak_rss_bytes": 1160228864,
+  "sha256": "7b2201317de44c6b1f15637e205cc08dd1179ee73c647c06b082cc88e3a921f7",
+  "historical_neighbor_refresh_benchmarked": false,
+  "full_population_quality_verified": false,
+  "run_context": {
+    "url": "https://github.com/wietzesuijker/what-to-id/actions/runs/38746291935",
+    "source_commit": "373f498",
+    "scope": "Fresh-runner restore of synthetic benchmark index"
+  }
+}
