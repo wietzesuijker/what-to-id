@@ -52,6 +52,8 @@ def test_build_writes_real_data_and_no_private_fields(tmp_path):
     build(path, str(tmp_path / "{group}.npz"), out, snapshot_date="2026-09-11")
     html = (out / "embeddings.html").read_text()
     assert "__ATLAS_META__" not in html
+    assert "__ATLAS_LOGIC__" not in html
+    assert "const AtlasScope" in html
     assert "new URLSearchParams(location.search)" in html
     assert "No sampled observations" in html
     text = (out / "embeddings-data/Aves.json").read_text()

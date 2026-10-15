@@ -209,6 +209,8 @@ def build(
         target.write_text(json.dumps(payload, separators=(",", ":")))
     template = Path(__file__).with_name("embedding_atlas.html").read_text()
     html = template.replace("__ATLAS_META__", json.dumps(metadata).replace("<", "\\u003c"))
+    logic = Path(__file__).with_name("embedding_atlas_logic.js").read_text()
+    html = html.replace("__ATLAS_LOGIC__", logic)
     (out / "embeddings.html").write_text(html)
 
 
