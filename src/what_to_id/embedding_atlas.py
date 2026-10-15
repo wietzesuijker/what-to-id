@@ -297,6 +297,8 @@ def build(
     logic = Path(__file__).with_name("embedding_atlas_logic.js").read_text()
     html = html.replace("__ATLAS_LOGIC__", logic)
     (out / "embeddings.html").write_text(html)
+    home = Path(__file__).with_name("embedding_atlas_home.html").read_text()
+    (out / "index.html").write_text(home)
 
 
 def main() -> None:
