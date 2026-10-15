@@ -10,17 +10,17 @@
   "reuse_status": "Verified cache hashes, coverage and normalized vectors; 64-row cross-runtime parity passes on two groups, URL identity does not prove unchanged original bytes",
   "policy": "One supplied primary-photo URL per observation, including unknown life groups",
   "cache_verification_job": "mila:11265151",
-  "gpu_pilot_job": "fir:65184771",
-  "recorded_at_UTC": "2026-10-15T14:56:43.445076+00:00",
+  "gpu_pilot_job": "fir:65186348",
+  "recorded_at_UTC": "2026-10-15T15:02:53.623810+00:00",
   "cluster": "fir",
   "remote_run": "/scratch/wietze/what-to-id/bulk-2026-10-15",
   "state": "queued, bulk blocked on successful pilot and validation dependencies",
   "jobs": {
-    "gpu_pilot": 65184771,
-    "cpu_photo_probe": 65185947,
-    "cpu_gpu_validation_gate": 65185969,
-    "photo_staging_array": 65185974,
-    "gpu_encoding_array": 65185979
+    "gpu_pilot": 65186348,
+    "cpu_photo_probe": 65186588,
+    "cpu_gpu_validation_gate": 65186367,
+    "photo_staging_array": 65186609,
+    "gpu_encoding_array": 65186633
   },
   "array": {
     "tasks": 112,
@@ -36,9 +36,9 @@
     "reason": "Fir RAC allocation accepts GPU jobs; CPU-only requests require the permitted default CPU account"
   },
   "dependencies": {
-    "validation_gate": "afterok:65184771",
-    "staging_array": "afterok:65185969:65185947",
-    "encoding_array": "aftercorr:65185974",
+    "validation_gate": "afterok:65186348",
+    "staging_array": "afterok:65186367:65186588",
+    "encoding_array": "aftercorr:65186609",
     "failed_prerequisite": "kill-on-invalid-dep=yes"
   },
   "pilot_gates": {
@@ -60,5 +60,10 @@
     "This queues embedding computation, it does not publish or deploy the full map index.",
     "Scratch storage is temporary; original verified reused vectors remain on Mila."
   ],
-  "stop_queue_command": "ssh fir scancel 65184771 65185947 65185969 65185974 65185979"
+  "stop_queue_command": "ssh fir scancel 65186348 65186588 65186367 65186609 65186633",
+  "cluster_setup": {
+    "csv_jobs_need_pyarrow": false,
+    "parquet_imports": "lazy in iNaturalist checkpoint I/O; CSV encoder and staging imports verified without PyArrow",
+    "superseded_submission": "Initial CPU probes exposed the Alliance PyArrow placeholder and eager imports; prerequisite failures cancelled the superseded bulk arrays without encoding."
+  }
 }

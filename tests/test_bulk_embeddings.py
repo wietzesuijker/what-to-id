@@ -1,6 +1,9 @@
 """Bulk workers checkpoint successful rows and reject ambiguous cache identities."""
 
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -8,6 +11,29 @@ import pandas as pd
 import pytest
 
 from what_to_id import bulk_embeddings as bulk
+
+
+def test_csv_cluster_imports_work_without_pyarrow():
+    code = """
+import importlib.abc
+import sys
+class NoArrow(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == 'pyarrow' or fullname.startswith('pyarrow.'):
+            raise ModuleNotFoundError('PyArrow intentionally unavailable in CSV workers')
+sys.meta_path.insert(0, NoArrow())
+from what_to_id import bulk_embeddings, staging
+assert 'pyarrow' not in sys.modules
+"""
+    root = Path(__file__).parents[1]
+    subprocess.run(
+        [sys.executable, "-c", code],
+        env={**os.environ, "PYTHONPATH": str(root / "src")},
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
 
 
 def setup(tmp_path, monkeypatch, *, count=6, shard_size=3):

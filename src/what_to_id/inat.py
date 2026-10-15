@@ -17,8 +17,6 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -265,6 +263,9 @@ def _frame(rows: list[dict]) -> pd.DataFrame:
 
 def _write_atomic(frame: pd.DataFrame, path: Path, meta: dict[str, str] | None = None) -> None:
     """Write ``frame`` to ``path`` via a tmp file, so an interruption never leaves a torn file."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
     table = pa.Table.from_pandas(frame, preserve_index=False)
     if meta:
         table = table.replace_schema_metadata({**(table.schema.metadata or {}), **meta})
@@ -297,6 +298,8 @@ def pull_group(
     id_below = None
     pages = 0
     if checkpoint is not None and checkpoint.exists():
+        import pyarrow.parquet as pq
+
         saved = pq.read_table(checkpoint)
         meta = saved.schema.metadata
         id_below, pages = int(meta[b"id_below"]), int(meta[b"pages"])

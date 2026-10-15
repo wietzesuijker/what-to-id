@@ -34,7 +34,7 @@ if test -d "$RUN/wheels"; then
     wheel_options+=(--find-links "$RUN/wheels")
 fi
 python -m pip install --no-index "${wheel_options[@]}" \
-    numpy pandas pyarrow requests scipy 'pillow==11.1.0'
+    numpy pandas requests scipy 'pillow==11.1.0'
 python --version
 python -m pip list --format=freeze
 printf 'job=%s task=%s host=%s shards_per_task=%s\n' \

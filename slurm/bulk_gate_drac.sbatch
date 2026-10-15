@@ -12,7 +12,7 @@ module load StdEnv/2023 python/3.11
 virtualenv --no-download "$SLURM_TMPDIR/env"
 # shellcheck source=/dev/null
 source "$SLURM_TMPDIR/env/bin/activate"
-pip install --no-index numpy pandas pyarrow requests scipy
+pip install --no-index numpy pandas requests scipy
 export PYTHONPATH="$RUN/src"
 python "$RUN/benchmarks/verify_bulk_pilot.py" \
     --manifest "$RUN/pilot/manifest.json" --results "$RUN/results" \
