@@ -135,3 +135,36 @@ def test_keyboard_set_membership_matches_brush_scope_without_mutating_input():
         'scope.matches([{id:1,name:"A"},{id:2,name:"B"}], '
         "{onlyBrushed:true, brushedIndices:scope.toggleIndex([],1)}).map(x=>x.r.id)"
     ) == [2]
+
+
+def test_separate_model_navigation_preserves_group_and_selected_observation():
+    assert (
+        evaluate(
+            'scope.modelHref("dinov3/embeddings.html", '
+            '"https://example.org/atlas/embeddings.html?bbox=1,2,3,4#group=Aves&id=1", '
+            '"Plantae", 123)'
+        )
+        == "https://example.org/atlas/dinov3/embeddings.html#group=Plantae&id=123"
+    )
+    assert (
+        evaluate(
+            'scope.modelHref("../embeddings.html", '
+            '"https://example.org/atlas/dinov3/embeddings.html", "Aves", 456)'
+        )
+        == "https://example.org/atlas/embeddings.html#group=Aves&id=456"
+    )
+
+
+def test_unknown_cross_model_observation_is_explicitly_reported_not_lost():
+    assert evaluate('scope.resolveSelection([{id:11},{id:12}], "99")') == {
+        "index": 0,
+        "missingRequestedId": 99,
+    }
+    assert evaluate('scope.resolveSelection([{id:11},{id:12}], "12")') == {
+        "index": 1,
+        "missingRequestedId": None,
+    }
+    assert evaluate("scope.resolveSelection([{id:11}], null)") == {
+        "index": 0,
+        "missingRequestedId": None,
+    }

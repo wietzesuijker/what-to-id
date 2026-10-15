@@ -205,3 +205,57 @@ def test_multigroup_build_requires_distinct_reference_pattern(tmp_path):
             snapshot_date="2026-09-11",
             reference_embedding_pattern=str(tmp_path / "shared.npz"),
         )
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "javascript:alert(1)",
+        "//evil.example/a",
+        "/absolute",
+        "https://evil.example/a",
+        r"..\evil.html",
+        "a\nb.html",
+    ],
+)
+def test_model_navigation_rejects_executable_or_nonrelative_urls(url):
+    from what_to_id.embedding_atlas import model_views
+
+    with pytest.raises(ValueError, match="relative"):
+        model_views([f"Model={url}"])
+
+
+def test_model_navigation_metadata_is_optional_and_escaped(tmp_path):
+    pool, _, _ = inputs(tmp_path)
+    path = tmp_path / "pool.parquet"
+    pool.to_parquet(path)
+    out = tmp_path / "site"
+    label = "Model </script><script>alert(1)</script>"
+    build(
+        path,
+        str(tmp_path / "{group}.npz"),
+        out,
+        snapshot_date="2026-09-11",
+        region_name="British Columbia <test>",
+        model_view_specs=[f"{label}=embeddings.html", "Other=dinov3/embeddings.html"],
+        current_label=label,
+    )
+    html = (out / "embeddings.html").read_text()
+    assert label not in html
+    assert "British Columbia <test>" not in html
+    assert "British Columbia \\u003ctest>" in html
+    assert '"current_label": "Model \\u003c/script>' in html
+    assert "dinov3/embeddings.html" in html
+    assert json.loads((out / "embeddings-data/Aves.json").read_text())["reference"] is None
+
+
+def test_current_model_label_must_match_configured_navigation(tmp_path):
+    with pytest.raises(ValueError, match="current model label"):
+        build(
+            tmp_path / "missing.parquet",
+            "",
+            tmp_path,
+            snapshot_date="2026-09-11",
+            model_view_specs=["A=embeddings.html"],
+            current_label="B",
+        )

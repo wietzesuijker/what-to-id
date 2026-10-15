@@ -12,6 +12,7 @@ import json
 import re
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import numpy as np
 import pandas as pd
@@ -150,6 +151,30 @@ def group_payload(
     }
 
 
+def model_views(specifications: list[str]) -> list[dict[str, str]]:
+    views = []
+    labels = set()
+    for specification in specifications:
+        label, separator, url = specification.partition("=")
+        label = label.strip()
+        if not separator or not label or not url:
+            raise ValueError("model views require LABEL=relativeURL")
+        parsed = urlsplit(url)
+        if (
+            parsed.scheme
+            or parsed.netloc
+            or url.startswith(("/", "\\"))
+            or "\\" in url
+            or any(ord(c) < 33 for c in url)
+        ):
+            raise ValueError("model view URLs must be relative page paths without schemes")
+        if label in labels:
+            raise ValueError(f"duplicate model view label: {label}")
+        labels.add(label)
+        views.append({"label": label, "url": url})
+    return views
+
+
 def build(
     pool_path: Path,
     embedding_pattern: str,
@@ -158,8 +183,14 @@ def build(
     snapshot_date: str,
     reference_embedding_pattern: str | None = None,
     reference_pool_path: Path | None = None,
+    region_name: str | None = None,
+    model_view_specs: list[str] | None = None,
+    current_label: str | None = None,
 ) -> None:
     snapshot_date = date.fromisoformat(snapshot_date).isoformat()
+    views = model_views(model_view_specs or [])
+    if current_label is not None and views and current_label not in {v["label"] for v in views}:
+        raise ValueError("current model label must match a configured model view")
     pool = pd.read_parquet(pool_path)
     required = {"id", "iconic_taxon", "lon", "lat", "taxon_name", "photo_url", "observed_on"}
     if not required <= set(pool):
@@ -213,6 +244,9 @@ def build(
             if reference_pool_path is not None
             else None
         ),
+        "region_name": region_name,
+        "model_views": views,
+        "current_label": current_label,
         "snapshot_date": snapshot_date,
         "pool_sha256": hashlib.sha256(pool_path.read_bytes()).hexdigest(),
         "groups": [{"id": p["group"], "count": len(p["records"])} for p in payloads],
@@ -242,6 +276,15 @@ def main() -> None:
     parser.add_argument(
         "--reference-pool", type=Path, help="Optional names for matched reference IDs"
     )
+    parser.add_argument("--region-name", help="Optional explicit source region name")
+    parser.add_argument(
+        "--model-view",
+        action="append",
+        default=[],
+        metavar="LABEL=relativeURL",
+        help="Optional model navigation page, repeat for each separate model",
+    )
+    parser.add_argument("--current-label", help="Label of this model view")
     args = parser.parse_args()
     build(
         args.pool,
@@ -250,6 +293,9 @@ def main() -> None:
         snapshot_date=args.snapshot_date,
         reference_embedding_pattern=args.reference_embeddings,
         reference_pool_path=args.reference_pool,
+        region_name=args.region_name,
+        model_view_specs=args.model_view,
+        current_label=args.current_label,
     )
 
 

@@ -37,6 +37,21 @@ const AtlasScope = (() => {
     if (result.has(index)) result.delete(index); else result.add(index);
     return [...result].sort((a, b) => a - b);
   }
-  return {inBounds, matches, brushIndices, toggleIndex};
+  function modelHref(relative, base, group, id) {
+    const target = new URL(relative, base);
+    const state = new URLSearchParams();
+    state.set('group', group);
+    if (id !== null && id !== undefined) state.set('id', String(id));
+    target.hash = state.toString();
+    return target.href;
+  }
+  function resolveSelection(records, requested) {
+    const id = Number(requested);
+    const valid = requested !== null && requested !== '' && Number.isSafeInteger(id) && id > 0;
+    if (!valid) return {index: 0, missingRequestedId: null};
+    const index = records.findIndex(record => record.id === id);
+    return {index: index < 0 ? 0 : index, missingRequestedId: index < 0 ? id : null};
+  }
+  return {inBounds, matches, brushIndices, toggleIndex, modelHref, resolveSelection};
 })();
 if (typeof module !== 'undefined') module.exports = AtlasScope;
